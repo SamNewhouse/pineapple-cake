@@ -1,5 +1,6 @@
 import axios, { AxiosError } from "axios";
 import { HttpMethod } from "../types";
+import { log, logError } from "./logging";
 
 export interface HttpRequestOptions {
   url: string;
@@ -21,7 +22,7 @@ export async function httpRequest<T = any>(options: HttpRequestOptions): Promise
   const { url, method = "get", data, params, headers, timeout = 5000 } = options;
 
   try {
-    console.log("[HTTP.request]", { url, method, params, data });
+    log("[HTTP.request]", { url, method, params, data });
     const response = await axios({
       url,
       method,
@@ -33,7 +34,7 @@ export async function httpRequest<T = any>(options: HttpRequestOptions): Promise
       },
       timeout,
     });
-    console.log("[HTTP.response]", { url, status: response.status, data: response.data });
+    log("[HTTP.response]", { url, status: response.status, data: response.data });
     return response.data;
   } catch (error) {
     const err: HttpRequestError = { message: "Unknown error" };
@@ -42,11 +43,11 @@ export async function httpRequest<T = any>(options: HttpRequestOptions): Promise
       err.message = (error as AxiosError).message;
       err.status = (error as AxiosError).response?.status;
       err.data = (error as AxiosError).response?.data;
-      console.log("[HTTP.error]", { url, status: err.status, data: err.data });
+      log("[HTTP.error]", { url, status: err.status, data: err.data });
     } else if (error instanceof Error) {
       err.message = error.message;
     }
-    console.error("[HTTP.error]", err);
+    logError("[HTTP.error]", err);
     throw err;
   }
 }
