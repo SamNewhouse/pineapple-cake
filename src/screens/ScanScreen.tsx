@@ -7,10 +7,8 @@ import { ResultView } from "../components/ResultView";
 import { scanBarcodeAPI } from "../api/scan";
 import { hasTimedData, addTimedData, clearStorage } from "../core/storage";
 import { StorageKey } from "../types";
-import { log, logError } from "../core/logging";
+import { log } from "../core/logging";
 import { STAGE } from "react-native-dotenv";
-
-const isDev = STAGE === "dev";
 
 // Define key with type safety
 const BARCODE_KEY: StorageKey = "barcodes";
@@ -23,7 +21,7 @@ export default function ScanScreen() {
 
   const handleBarcodeScan = useCallback(
     async (scanResult: BarcodeScanningResult) => {
-      if (isDev) {
+      if (STAGE === "dev") {
         await clearStorage(BARCODE_KEY);
         log("[SCAN.clear] Cleared barcode storage (dev mode).");
       }
@@ -55,7 +53,7 @@ export default function ScanScreen() {
         setScannerLocked(false);
       }
     },
-    [scannerLocked, isDev],
+    [scannerLocked, STAGE],
   );
 
   const resetScan = useCallback(() => {
