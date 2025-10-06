@@ -18,7 +18,6 @@ export async function addData<T>(storageKey: StorageKey, value: T): Promise<void
     let arr: TimedStorageData<T>[] = stored ? JSON.parse(stored) : [];
     arr.push({ value, storedAt: now });
     await AsyncStorage.setItem(storageKey, JSON.stringify(arr));
-    log(`[STORAGE.add] "${value}" stored in "${storageKey}".`);
   } catch (e) {
     logError(`[STORAGE.add] Could not add data "${value}" to "${storageKey}":`, e);
   }
