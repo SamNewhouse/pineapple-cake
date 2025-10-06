@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { StorageKey } from "../types";
+import { log, logError } from "./logging";
 
 export interface TimedStorageData<T = string> {
   value: T;
@@ -17,9 +18,9 @@ export async function addData<T>(storageKey: StorageKey, value: T): Promise<void
     let arr: TimedStorageData<T>[] = stored ? JSON.parse(stored) : [];
     arr.push({ value, storedAt: now });
     await AsyncStorage.setItem(storageKey, JSON.stringify(arr));
-    console.log(`[STORAGE.add] "${value}" stored in "${storageKey}".`);
+    log(`[STORAGE.add] "${value}" stored in "${storageKey}".`);
   } catch (e) {
-    console.error(`[STORAGE.add] Could not add data "${value}" to "${storageKey}":`, e);
+    logError(`[STORAGE.add] Could not add data "${value}" to "${storageKey}":`, e);
   }
 }
 
@@ -41,11 +42,9 @@ export async function addTimedData<T>(storageKey: StorageKey, value: T): Promise
       }
     }
     await AsyncStorage.setItem(storageKey, JSON.stringify(arr));
-    console.log(
-      `[STORAGE.addTimed] "${value}" in "${storageKey}" now has TTL 24h (${DEFAULT_TTL}ms).`,
-    );
+    log(`[STORAGE.addTimed] "${value}" in "${storageKey}" now has TTL 24h (${DEFAULT_TTL}ms).`);
   } catch (e) {
-    console.error(`[STORAGE.addTimed] Could not add timed data "${value}" to "${storageKey}":`, e);
+    logError(`[STORAGE.addTimed] Could not add timed data "${value}" to "${storageKey}":`, e);
   }
 }
 
@@ -57,9 +56,9 @@ export async function removeTimedData<T>(storageKey: StorageKey, value: T): Prom
     let arr: TimedStorageData<T>[] = JSON.parse(stored);
     arr = arr.filter((data) => data.value !== value);
     await AsyncStorage.setItem(storageKey, JSON.stringify(arr));
-    console.log(`[STORAGE.remove] "${value}" removed from "${storageKey}".`);
+    log(`[STORAGE.remove] "${value}" removed from "${storageKey}".`);
   } catch (e) {
-    console.error(`[STORAGE.remove] Could not remove data "${value}" from "${storageKey}":`, e);
+    logError(`[STORAGE.remove] Could not remove data "${value}" from "${storageKey}":`, e);
   }
 }
 
@@ -67,9 +66,9 @@ export async function removeTimedData<T>(storageKey: StorageKey, value: T): Prom
 export async function clearStorage(storageKey: StorageKey): Promise<void> {
   try {
     await AsyncStorage.removeItem(storageKey);
-    console.log(`[STORAGE.clear] Cleared all data from "${storageKey}".`);
+    log(`[STORAGE.clear] Cleared all data from "${storageKey}".`);
   } catch (e) {
-    console.error(`[STORAGE.clear] Could not clear "${storageKey}":`, e);
+    logError(`[STORAGE.clear] Could not clear "${storageKey}":`, e);
   }
 }
 
@@ -88,7 +87,7 @@ export async function getTimedData<T>(storageKey: StorageKey): Promise<T[]> {
     arr = pruneTimedData(arr);
     return arr.map((data) => data.value);
   } catch (e) {
-    console.error(`[STORAGE.get] Could not get data from "${storageKey}":`, e);
+    logError(`[STORAGE.get] Could not get data from "${storageKey}":`, e);
     return [];
   }
 }
@@ -101,10 +100,10 @@ export async function hasTimedData<T>(storageKey: StorageKey, value: T): Promise
     let arr: TimedStorageData<T>[] = JSON.parse(stored);
     arr = pruneTimedData(arr);
     const exists = arr.some((data) => data.value === value);
-    console.log(`[STORAGE.has] "${value}" ${exists ? "found" : "not found"} in "${storageKey}".`);
+    log(`[STORAGE.has] "${value}" ${exists ? "found" : "not found"} in "${storageKey}".`);
     return exists;
   } catch (e) {
-    console.error(`[STORAGE.has] Could not check data "${value}" in "${storageKey}":`, e);
+    logError(`[STORAGE.has] Could not check data "${value}" in "${storageKey}":`, e);
     return false;
   }
 }

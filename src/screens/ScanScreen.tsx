@@ -7,9 +7,10 @@ import { ResultView } from "../components/ResultView";
 import { scanBarcodeAPI } from "../api/scan";
 import { hasTimedData, addTimedData, clearStorage } from "../core/storage";
 import { StorageKey } from "../types";
+import { log, logError } from "../core/logging";
+import { STAGE } from "react-native-dotenv";
 
-// Toggle this variable to enable/disable clearing barcode from storage after scan
-const clearAfterScan = true;
+const isDev = STAGE === "dev";
 
 // Define key with type safety
 const BARCODE_KEY: StorageKey = "barcodes";
@@ -22,8 +23,13 @@ export default function ScanScreen() {
 
   const handleBarcodeScan = useCallback(
     async (scanResult: BarcodeScanningResult) => {
+      if (isDev) {
+        await clearStorage(BARCODE_KEY);
+        log("[SCAN.clear] Cleared barcode storage (dev mode).");
+      }
+
       if (scannerLocked || !scanResult?.data) {
-        console.log("[SCAN.ignore] Ignored scan event (locked or empty).");
+        log("[SCAN.ignore] Ignored scan event (locked or empty).");
         return;
       }
       setScannerLocked(true);
@@ -33,47 +39,43 @@ export default function ScanScreen() {
       const alreadyScanned = await hasTimedData(BARCODE_KEY, scanResult.data);
       if (!alreadyScanned) {
         await addTimedData(BARCODE_KEY, scanResult.data);
-        console.log("[SCAN.store] Stored new barcode:", scanResult.data);
-      } else {
-        console.log("[SCAN.exists] Barcode already in storage:", scanResult.data);
-      }
+        log("[SCAN.store] Stored new barcode:", scanResult.data);
 
-      try {
-        const apiResult = await scanBarcodeAPI("258752952", scanResult.data);
-
-        setResult(apiResult);
-
-        if (!apiResult?.error && clearAfterScan === true) {
-          await clearStorage(BARCODE_KEY);
-          console.log("[SCAN.clear] Cleared barcode storage after successful API response.");
+        try {
+          const apiResult = await scanBarcodeAPI("258752952", scanResult.data);
+          setResult(apiResult);
+        } catch (e) {
+          setResult({ error: e });
+        } finally {
+          setProcessing(false);
         }
-      } catch (e) {
-        setResult({ error: e });
-      } finally {
+      } else {
+        log("[SCAN.exists] Barcode already in storage:", scanResult.data);
         setProcessing(false);
+        setScannerLocked(false);
       }
     },
-    [scannerLocked],
+    [scannerLocked, isDev],
   );
 
   const resetScan = useCallback(() => {
-    console.log("[SCAN.reset] Resetting scan state.");
+    log("[SCAN.reset] Resetting scan state.");
     setScannerLocked(false);
     setResult(null);
     setProcessing(false);
   }, []);
 
   if (processing) {
-    console.log("[SCAN.processing] Showing processing state.");
+    log("[SCAN.processing] Showing processing state.");
     return <ProcessingView theme={theme} />;
   }
 
   if (result) {
-    console.log("[SCAN.result] Showing result view.");
+    log("[SCAN.result] Showing result view.");
     return <ResultView theme={theme} result={result} resetScan={resetScan} />;
   }
 
-  console.log("[SCAN.ready] Ready to scan.");
+  log("[SCAN.ready] Ready to scan.");
   return (
     <Layout style={{ flex: 1, backgroundColor: theme["color-dark"] }}>
       <Camera onBarcodeScanned={handleBarcodeScan} />
