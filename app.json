@@ -21,7 +21,15 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.samnewhouse.pineapplecake",
+      "permissions": [
+        "INTERNET",
+        "CAMERA",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ],
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -31,6 +39,11 @@
         }
       }
     },
-    "plugins": ["expo-barcode-scanner", "expo-camera"]
+    "plugins": ["expo-camera"],
+    "extra": {
+      "eas": {
+        "projectId": "f447b52a-0c3b-4d21-8316-cfac45567a5d"
+      }
+    }
   }
 }
