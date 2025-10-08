@@ -1,7 +1,7 @@
 import React from "react";
 import { Layout, Text, useTheme } from "@ui-kitten/components";
 
-export default function InventoryScreen() {
+export default function ItemsScreen() {
   const theme = useTheme();
   return (
     <Layout
@@ -12,7 +12,7 @@ export default function InventoryScreen() {
         backgroundColor: theme["color-dark"],
       }}
     >
-      <Text category="h1">INVENTORY</Text>
+      <Text category="h1">ITEMS</Text>
     </Layout>
   );
 }

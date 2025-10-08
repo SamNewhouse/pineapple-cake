@@ -23,25 +23,28 @@ export async function addData<T>(storageKey: StorageKey, value: T): Promise<void
   }
 }
 
-// Add data with a TTL (calls addData and then updates TTL field)
-export async function addTimedData<T>(storageKey: StorageKey, value: T): Promise<void> {
+// Overload addTimedData to accept custom TTL
+export async function addTimedData<T>(
+  storageKey: StorageKey,
+  value: T,
+  ttl: number = DEFAULT_TTL,
+): Promise<void> {
   try {
     // Use addData to add value and storedAt
     await addData(storageKey, value);
 
-    // Now add the 24h TTL by reloading, updating, and resaving
+    // Now add the TTL by reloading, updating, and resaving
     const stored = await AsyncStorage.getItem(storageKey);
     let arr: TimedStorageData<T>[] = stored ? JSON.parse(stored) : [];
-
     // Find the most recent item with our value (that has no TTL yet), update it with TTL
     for (let i = arr.length - 1; i >= 0; i--) {
       if (arr[i].value === value && !arr[i].ttl) {
-        arr[i].ttl = DEFAULT_TTL;
+        arr[i].ttl = ttl;
         break;
       }
     }
     await AsyncStorage.setItem(storageKey, JSON.stringify(arr));
-    log(`[STORAGE.addTimed] "${value}" in "${storageKey}" now has TTL 24h (${DEFAULT_TTL}ms).`);
+    log(`[STORAGE.addTimed] "${value}" in "${storageKey}" now has TTL ${ttl}ms.`);
   } catch (e) {
     logError(`[STORAGE.addTimed] Could not add timed data "${value}" to "${storageKey}":`, e);
   }

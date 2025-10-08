@@ -2,7 +2,7 @@ import React from "react";
 import { TabBar, Tab, useTheme } from "@ui-kitten/components";
 import { Screen } from "../types";
 
-const tabLabels: Screen[] = ["home", "scan", "inventory"];
+const tabLabels: Screen[] = ["home", "scan", "items", "trade"];
 
 export default function TopTabBar({
   selectedScreen,

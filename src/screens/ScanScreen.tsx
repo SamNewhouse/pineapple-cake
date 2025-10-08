@@ -10,9 +10,6 @@ import { StorageKey } from "../types";
 import { log } from "../core/logging";
 import { STAGE } from "react-native-dotenv";
 
-// Define which storage key to use for scanned barcodes
-const BARCODE_KEY: StorageKey = "barcodes";
-
 export default function ScanScreen() {
   const theme = useTheme();
   const [processing, setProcessing] = useState(false);
@@ -24,7 +21,7 @@ export default function ScanScreen() {
     async (scanResult: BarcodeScanningResult) => {
       // In development, clear storage before every scan for easier testing
       if (STAGE === "dev") {
-        await clearStorage(BARCODE_KEY);
+        await clearStorage(StorageKey.barcodes);
       }
 
       // If scanner is in use or there's no data, do nothing
@@ -37,7 +34,7 @@ export default function ScanScreen() {
       setResult(null);
 
       // Check if this barcode has already been processed
-      const alreadyScanned = await hasTimedData(BARCODE_KEY, scanResult.data);
+      const alreadyScanned = await hasTimedData(StorageKey.barcodes, scanResult.data);
       if (!alreadyScanned) {
         // If not, call the backend to process the barcode
         try {
@@ -46,7 +43,7 @@ export default function ScanScreen() {
 
           // Only store the barcode if the API call was successful (no error)
           if (!apiResult?.error) {
-            await addTimedData(BARCODE_KEY, scanResult.data);
+            await addTimedData(StorageKey.barcodes, scanResult.data);
           }
         } catch (e) {
           // Handle errors from API

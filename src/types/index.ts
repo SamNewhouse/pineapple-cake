@@ -1,10 +1,15 @@
 import { BarcodeScanningResult } from "expo-camera";
 
-export type Screen = "home" | "scan" | "inventory";
+export type Screen = "home" | "scan" | "items" | "trade";
 
 export type HttpMethod = "get" | "post" | "put" | "delete" | "patch";
 
-export type StorageKey = "barcodes" | "users" | "tokens" | "scores" | "settings";
+export enum StorageKey {
+  barcodes = "barcodes",
+  players = "players",
+  sessions = "sessions",
+  settings = "settings",
+}
 
 export type CameraScreenProps = {
   onBarcodeScanned: (result: BarcodeScanningResult) => void;

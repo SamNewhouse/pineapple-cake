@@ -72,15 +72,6 @@
           }
         }
       }
-    },
-    "ProgressBar": {
-      "appearances": {
-        "default": {
-          "mapping": {
-            "progressBarBackgroundColor": "color-darkest"
-          }
-        }
-      }
     }
   }
 }
