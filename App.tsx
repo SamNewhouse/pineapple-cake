@@ -7,49 +7,20 @@ import TopTabBar from "./src/components/TopTabBar";
 import HomeScreen from "./src/screens/HomeScreen";
 import ScanScreen from "./src/screens/ScanScreen";
 import ItemsScreen from "./src/screens/ItemsScreen";
-import { Screen, StorageKey } from "./src/types";
+import SettingsScreen from "./src/screens/SettingsScreen";
+import { Screen, Player } from "./src/types";
 import scannerTheme from "./src/styling/theme.json";
 import customMapping from "./src/styling/mapping.json";
 import { StatusBar } from "expo-status-bar";
-import { getTimedData } from "./src/core/storage";
-import { AuthScreen } from "./src/screens/AuthScreen";
+import { PlayerContext } from "./src/context/PlayerContext";
+import { AuthGuard } from "./src/components/AuthGuard";
 
 export default function App() {
-  const [player, setPlayer] = useState<any | null>(null);
+  const [player, setPlayer] = useState<Player | null>(null);
   const [screen, setScreen] = useState<Screen>("home");
 
-  // Check local session/player on mount
-  useEffect(() => {
-    const checkPlayer = async () => {
-      const players = await getTimedData(StorageKey.players);
-      setPlayer(players.length > 0 ? players[0] : null);
-    };
-    checkPlayer();
-  }, []);
-
-  // Handle successful sign-in
-  const handleSignedIn = (playerObj: any) => {
-    setPlayer(playerObj);
-    setScreen("home");
-  };
-
-  // Show AuthScreen if not signed in
-  if (!player) {
-    return (
-      <ApplicationProvider
-        {...eva}
-        theme={{ ...eva.dark, ...scannerTheme }}
-        customMapping={customMapping}
-      >
-        <StatusBar style="light" />
-        <AuthScreen theme={scannerTheme} onSignedIn={handleSignedIn} />
-      </ApplicationProvider>
-    );
-  }
-
-  // Main app UI after sign-in
   return (
-    <>
+    <PlayerContext.Provider value={{ player, setPlayer }}>
       <IconRegistry icons={EvaIconsPack} />
       <ApplicationProvider
         {...eva}
@@ -57,15 +28,25 @@ export default function App() {
         customMapping={customMapping}
       >
         <SafeAreaView style={{ flex: 1, backgroundColor: scannerTheme["color-dark"] }}>
-          <StatusBar style="light" />
-          <TopTabBar selectedScreen={screen} onTabSelect={setScreen} />
-          <Layout style={{ flex: 1, backgroundColor: scannerTheme["color-dark"] }}>
-            {screen === "home" && <HomeScreen />}
-            {screen === "scan" && <ScanScreen />}
-            {screen === "items" && <ItemsScreen />}
-          </Layout>
+          <AuthGuard>
+            <StatusBar style="light" />
+            <TopTabBar selectedScreen={screen} onTabSelect={setScreen} />
+            <Layout style={{ flex: 1, backgroundColor: scannerTheme["color-dark"] }}>
+              {screen === "home" && <HomeScreen />}
+              {screen === "scan" && <ScanScreen />}
+              {screen === "items" && <ItemsScreen />}
+              {screen === "settings" && (
+                <SettingsScreen
+                  onSignedOut={() => {
+                    setPlayer(null);
+                    setScreen("home");
+                  }}
+                />
+              )}
+            </Layout>
+          </AuthGuard>
         </SafeAreaView>
       </ApplicationProvider>
-    </>
+    </PlayerContext.Provider>
   );
 }

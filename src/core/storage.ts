@@ -44,7 +44,7 @@ export async function addTimedData<T>(
       }
     }
     await AsyncStorage.setItem(storageKey, JSON.stringify(arr));
-    log(`[STORAGE.addTimed] "${value}" in "${storageKey}" now has TTL ${ttl}ms.`);
+    log(`[STORAGE.addTimed] ${JSON.stringify(value)} in "${storageKey}" now has TTL ${ttl}ms.`);
   } catch (e) {
     logError(`[STORAGE.addTimed] Could not add timed data "${value}" to "${storageKey}":`, e);
   }
