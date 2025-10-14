@@ -1,7 +1,8 @@
 {
   "expo": {
-    "name": "scanning-game",
-    "slug": "scanning-game",
+    "name": "pineapple-cake",
+    "slug": "pineapple-cake",
+    "scheme": "pineapplecake",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
