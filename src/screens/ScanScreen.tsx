@@ -1,15 +1,15 @@
 import React, { useState, useCallback } from "react";
-import { Layout, Text, useTheme } from "@ui-kitten/components";
+import { Layout, useTheme } from "@ui-kitten/components";
 import Camera from "../components/Camera";
 import { BarcodeScanningResult } from "expo-camera";
-import { ProcessingView } from "../components/ProcessingView";
 import { ResultView } from "../components/ResultView";
 import { scanBarcodeAPI } from "../api/scan";
 import { hasTimedData, addTimedData, clearStorage } from "../core/storage";
-import { StorageKey } from "../types";
+import { LocalStorage } from "../types";
 import { log } from "../core/logging";
 import { STAGE } from "react-native-dotenv";
 import { useRequiredPlayer } from "../context/PlayerContext";
+import { Loading } from "../components/Loading";
 
 export default function ScanScreen() {
   const player = useRequiredPlayer();
@@ -21,7 +21,7 @@ export default function ScanScreen() {
   const handleBarcodeScan = useCallback(
     async (scanResult: BarcodeScanningResult) => {
       if (STAGE === "dev") {
-        await clearStorage(StorageKey.barcodes);
+        await clearStorage(LocalStorage.BARCODE);
       }
 
       if (scannerLocked || !scanResult?.data) {
@@ -31,14 +31,14 @@ export default function ScanScreen() {
       setProcessing(true);
       setResult(null);
 
-      const alreadyScanned = await hasTimedData(StorageKey.barcodes, scanResult.data);
+      const alreadyScanned = await hasTimedData(LocalStorage.BARCODE, scanResult.data);
       if (!alreadyScanned) {
         try {
-          const apiResult = await scanBarcodeAPI(player.playerId, scanResult.data);
+          const apiResult = await scanBarcodeAPI(player.id, scanResult.data);
           setResult(apiResult);
 
           if (!apiResult?.error) {
-            await addTimedData(StorageKey.barcodes, scanResult.data);
+            await addTimedData(LocalStorage.BARCODE, scanResult.data);
           }
         } catch (e) {
           setResult({ error: e });
@@ -61,11 +61,11 @@ export default function ScanScreen() {
   }, []);
 
   if (processing) {
-    return <ProcessingView theme={theme} />;
+    return <Loading message="Processing scan..." />;
   }
 
   if (result) {
-    return <ResultView theme={theme} result={result} resetScan={resetScan} />;
+    return <ResultView result={result} resetScan={resetScan} />;
   }
 
   return (

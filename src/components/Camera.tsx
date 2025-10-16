@@ -1,9 +1,12 @@
 import React from "react";
-import { View, Text, TouchableOpacity } from "react-native";
-import { CameraView, useCameraPermissions, BarcodeScanningResult } from "expo-camera";
+import { View, Text } from "react-native";
+import { BarcodeScanningResult, CameraView, useCameraPermissions } from "expo-camera";
 import { useTheme } from "@ui-kitten/components";
-import { CameraProps } from "../types";
 import { Button } from "./Button";
+
+interface CameraProps {
+  onBarcodeScanned: (result: BarcodeScanningResult) => void;
+};
 
 export default function Camera({ onBarcodeScanned }: CameraProps) {
   const [permission, requestPermission] = useCameraPermissions();
@@ -18,7 +21,7 @@ export default function Camera({ onBarcodeScanned }: CameraProps) {
         <Text
           style={{ color: theme["color-text"], marginBottom: 24, fontSize: 18, fontWeight: "bold" }}
         >
-          Camera access is required to scan barcodes
+          Camera access is required
         </Text>
         <Button theme={theme} onPress={requestPermission}>
           Grant Camera Permission

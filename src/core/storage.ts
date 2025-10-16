@@ -1,111 +1,216 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { StorageKey } from "../types";
+import { LocalStorage } from "../types";
 import { log, logError } from "./logging";
 
+// Types
 export interface TimedStorageData<T = string> {
   value: T;
   storedAt: number;
-  ttl?: number; // milliseconds
+  ttl?: number;
 }
 
+type StorageKey = LocalStorage | string;
+type StorageResult<T> = Promise<T | null>;
+type StorageAction = Promise<void>;
+
+// Constants
 const DEFAULT_TTL = 24 * 60 * 60 * 1000; // 24 hours
 
-// Add data with NO expiry (kept forever unless manually removed)
-export async function addData<T>(storageKey: StorageKey, value: T): Promise<void> {
+// Core storage utilities
+async function getStorageItem(key: StorageKey): Promise<string | null> {
   try {
-    const now = Date.now();
-    const stored = await AsyncStorage.getItem(storageKey);
-    let arr: TimedStorageData<T>[] = stored ? JSON.parse(stored) : [];
-    arr.push({ value, storedAt: now });
-    await AsyncStorage.setItem(storageKey, JSON.stringify(arr));
-  } catch (e) {
-    logError(`[STORAGE.add] Could not add data "${value}" to "${storageKey}":`, e);
+    return await AsyncStorage.getItem(key);
+  } catch (error) {
+    logError(`[STORAGE.getItem] Failed to get "${key}":`, error);
+    return null;
   }
 }
 
-// Overload addTimedData to accept custom TTL
+async function setStorageItem(key: StorageKey, value: string): StorageAction {
+  try {
+    await AsyncStorage.setItem(key, value);
+  } catch (error) {
+    logError(`[STORAGE.setItem] Failed to set "${key}":`, error);
+    throw error;
+  }
+}
+
+async function removeStorageItem(key: StorageKey): StorageAction {
+  try {
+    await AsyncStorage.removeItem(key);
+  } catch (error) {
+    logError(`[STORAGE.removeItem] Failed to remove "${key}":`, error);
+    throw error;
+  }
+}
+
+// JSON parsing utilities
+function parseStorageData<T>(data: string | null, defaultValue: T): T {
+  if (!data) return defaultValue;
+  try {
+    return JSON.parse(data) as T;
+  } catch (error) {
+    logError(`[STORAGE.parse] Invalid JSON data:`, error);
+    return defaultValue;
+  }
+}
+
+function stringifyStorageData<T>(data: T): string {
+  try {
+    return JSON.stringify(data);
+  } catch (error) {
+    logError(`[STORAGE.stringify] Failed to stringify data:`, error);
+    throw error;
+  }
+}
+
+// Timed data utilities
+function isDataExpired<T>(item: TimedStorageData<T>): boolean {
+  const now = Date.now();
+  const ttl = item.ttl || DEFAULT_TTL;
+  return now - item.storedAt >= ttl;
+}
+
+function pruneExpiredData<T>(arr: TimedStorageData<T>[]): TimedStorageData<T>[] {
+  return arr.filter((item) => !isDataExpired(item));
+}
+
+async function getTimedStorageArray<T>(key: StorageKey): Promise<TimedStorageData<T>[]> {
+  const stored = await getStorageItem(key);
+  return parseStorageData(stored, [] as TimedStorageData<T>[]);
+}
+
+async function setTimedStorageArray<T>(key: StorageKey, arr: TimedStorageData<T>[]): StorageAction {
+  const data = stringifyStorageData(arr);
+  await setStorageItem(key, data);
+}
+
+// Public API - Simple key-value storage
+export async function storeData<T>(key: StorageKey, value: T): StorageAction {
+  try {
+    const data = stringifyStorageData(value);
+    await setStorageItem(key, data);
+    log(`[STORAGE.store] Data stored in "${key}"`);
+  } catch (error) {
+    logError(`[STORAGE.store] Could not store data in "${key}":`, error);
+    throw error;
+  }
+}
+
+export async function getData<T>(key: StorageKey): StorageResult<T> {
+  try {
+    const stored = await getStorageItem(key);
+    if (!stored) return null;
+    return parseStorageData(stored, null);
+  } catch (error) {
+    logError(`[STORAGE.get] Could not get data from "${key}":`, error);
+    return null;
+  }
+}
+
+export async function clearStorage(key: StorageKey): StorageAction {
+  try {
+    await removeStorageItem(key);
+    log(`[STORAGE.clear] Cleared all data from "${key}"`);
+  } catch (error) {
+    logError(`[STORAGE.clear] Could not clear "${key}":`, error);
+    throw error;
+  }
+}
+
+// Public API - Timed array storage
+export async function addData<T>(key: StorageKey, value: T): StorageAction {
+  try {
+    const arr = await getTimedStorageArray<T>(key);
+    const newItem: TimedStorageData<T> = {
+      value,
+      storedAt: Date.now(),
+    };
+    arr.push(newItem);
+    await setTimedStorageArray(key, arr);
+    log(`[STORAGE.add] Added data to "${key}"`);
+  } catch (error) {
+    logError(`[STORAGE.add] Could not add data to "${key}":`, error);
+    throw error;
+  }
+}
+
 export async function addTimedData<T>(
-  storageKey: StorageKey,
+  key: StorageKey,
   value: T,
   ttl: number = DEFAULT_TTL,
-): Promise<void> {
+): StorageAction {
   try {
-    // Use addData to add value and storedAt
-    await addData(storageKey, value);
+    const arr = await getTimedStorageArray<T>(key);
+    const newItem: TimedStorageData<T> = {
+      value,
+      storedAt: Date.now(),
+      ttl,
+    };
+    arr.push(newItem);
+    await setTimedStorageArray(key, arr);
+    log(`[STORAGE.addTimed] Added timed data to "${key}" with TTL ${ttl}ms`);
+  } catch (error) {
+    logError(`[STORAGE.addTimed] Could not add timed data to "${key}":`, error);
+    throw error;
+  }
+}
 
-    // Now add the TTL by reloading, updating, and resaving
-    const stored = await AsyncStorage.getItem(storageKey);
-    let arr: TimedStorageData<T>[] = stored ? JSON.parse(stored) : [];
-    // Find the most recent item with our value (that has no TTL yet), update it with TTL
-    for (let i = arr.length - 1; i >= 0; i--) {
-      if (arr[i].value === value && !arr[i].ttl) {
-        arr[i].ttl = ttl;
-        break;
-      }
+export async function removeTimedData<T>(key: StorageKey, value: T): StorageAction {
+  try {
+    const arr = await getTimedStorageArray<T>(key);
+    const filteredArr = arr.filter((item) => item.value !== value);
+    await setTimedStorageArray(key, filteredArr);
+    log(`[STORAGE.remove] Removed data from "${key}"`);
+  } catch (error) {
+    logError(`[STORAGE.remove] Could not remove data from "${key}":`, error);
+    throw error;
+  }
+}
+
+export async function getTimedData<T>(key: StorageKey): Promise<T[]> {
+  try {
+    const arr = await getTimedStorageArray<T>(key);
+    const validArr = pruneExpiredData(arr);
+
+    // Save back the pruned array if items were removed
+    if (validArr.length !== arr.length) {
+      await setTimedStorageArray(key, validArr);
     }
-    await AsyncStorage.setItem(storageKey, JSON.stringify(arr));
-    log(`[STORAGE.addTimed] ${JSON.stringify(value)} in "${storageKey}" now has TTL ${ttl}ms.`);
-  } catch (e) {
-    logError(`[STORAGE.addTimed] Could not add timed data "${value}" to "${storageKey}":`, e);
-  }
-}
 
-// Remove specific data by value
-export async function removeTimedData<T>(storageKey: StorageKey, value: T): Promise<void> {
-  try {
-    const stored = await AsyncStorage.getItem(storageKey);
-    if (!stored) return;
-    let arr: TimedStorageData<T>[] = JSON.parse(stored);
-    arr = arr.filter((data) => data.value !== value);
-    await AsyncStorage.setItem(storageKey, JSON.stringify(arr));
-    log(`[STORAGE.remove] "${value}" removed from "${storageKey}".`);
-  } catch (e) {
-    logError(`[STORAGE.remove] Could not remove data "${value}" from "${storageKey}":`, e);
-  }
-}
-
-// Clear all data for a storageKey
-export async function clearStorage(storageKey: StorageKey): Promise<void> {
-  try {
-    await AsyncStorage.removeItem(storageKey);
-    log(`[STORAGE.clear] Cleared all data from "${storageKey}".`);
-  } catch (e) {
-    logError(`[STORAGE.clear] Could not clear "${storageKey}":`, e);
-  }
-}
-
-// Prune expired data
-function pruneTimedData<T>(arr: TimedStorageData<T>[]): TimedStorageData<T>[] {
-  const now = Date.now();
-  return arr.filter((data) => now - data.storedAt < (data.ttl || DEFAULT_TTL));
-}
-
-// Get all unexpired data
-export async function getTimedData<T>(storageKey: StorageKey): Promise<T[]> {
-  try {
-    const stored = await AsyncStorage.getItem(storageKey);
-    if (!stored) return [];
-    let arr: TimedStorageData<T>[] = JSON.parse(stored);
-    arr = pruneTimedData(arr);
-    return arr.map((data) => data.value);
-  } catch (e) {
-    logError(`[STORAGE.get] Could not get data from "${storageKey}":`, e);
+    return validArr.map((item) => item.value);
+  } catch (error) {
+    logError(`[STORAGE.get] Could not get timed data from "${key}":`, error);
     return [];
   }
 }
 
-// Check if data exists and is unexpired
-export async function hasTimedData<T>(storageKey: StorageKey, value: T): Promise<boolean> {
+export async function hasTimedData<T>(key: StorageKey, value: T): Promise<boolean> {
   try {
-    const stored = await AsyncStorage.getItem(storageKey);
-    if (!stored) return false;
-    let arr: TimedStorageData<T>[] = JSON.parse(stored);
-    arr = pruneTimedData(arr);
-    const exists = arr.some((data) => data.value === value);
-    log(`[STORAGE.has] "${value}" ${exists ? "found" : "not found"} in "${storageKey}".`);
+    const arr = await getTimedStorageArray<T>(key);
+    const validArr = pruneExpiredData(arr);
+    const exists = validArr.some((item) => item.value === value);
+
+    log(`[STORAGE.has] "${value}" ${exists ? "found" : "not found"} in "${key}"`);
     return exists;
-  } catch (e) {
-    logError(`[STORAGE.has] Could not check data "${value}" in "${storageKey}":`, e);
+  } catch (error) {
+    logError(`[STORAGE.has] Could not check data in "${key}":`, error);
     return false;
+  }
+}
+
+// Utility functions for manual cleanup
+export async function pruneExpiredStorageData<T>(key: StorageKey): StorageAction {
+  try {
+    const arr = await getTimedStorageArray<T>(key);
+    const validArr = pruneExpiredData(arr);
+
+    if (validArr.length !== arr.length) {
+      await setTimedStorageArray(key, validArr);
+      log(`[STORAGE.prune] Removed ${arr.length - validArr.length} expired items from "${key}"`);
+    }
+  } catch (error) {
+    logError(`[STORAGE.prune] Could not prune expired data from "${key}":`, error);
+    throw error;
   }
 }
