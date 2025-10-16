@@ -10,28 +10,27 @@
     "format": "prettier --write ."
   },
   "dependencies": {
-    "@eva-design/eva": "^2.2.0",
+    "@eva-design/eva": "2.2.0",
     "@react-native-async-storage/async-storage": "2.2.0",
-    "@ui-kitten/components": "^5.3.1",
-    "@ui-kitten/eva-icons": "^5.3.1",
-    "axios": "^1.12.2",
-    "expo": "~54.0.12",
-    "expo-auth-session": "^7.0.8",
-    "expo-camera": "~17.0.8",
-    "expo-status-bar": "~3.0.8",
+    "@ui-kitten/components": "5.3.1",
+    "@ui-kitten/eva-icons": "5.3.1",
+    "axios": "1.12.2",
+    "expo": "54.0.13",
+    "expo-auth-session": "7.0.8",
+    "expo-camera": "17.0.8",
+    "expo-status-bar": "3.0.8",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-native": "0.81.4",
-    "react-native-dotenv": "^3.4.11",
-    "react-native-safe-area-context": "^5.6.1",
-    "react-native-web": "^0.21.0"
+    "react-native-dotenv": "3.4.11",
+    "react-native-safe-area-context": "5.6.1"
   },
   "devDependencies": {
-    "@types/react": "~19.1.0",
-    "@types/react-native-dotenv": "^0.2.2",
-    "@ui-kitten/metro-config": "^5.3.1",
-    "prettier": "^3.6.2",
-    "typescript": "~5.9.2"
+    "@types/react": "19.1.10",
+    "@types/react-native-dotenv": "0.2.2",
+    "@ui-kitten/metro-config": "5.3.1",
+    "prettier": "3.6.2",
+    "typescript": "5.9.3"
   },
   "private": true
 }
