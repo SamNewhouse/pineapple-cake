@@ -28,7 +28,7 @@ export default function TopTabBar({
           key={label}
           title={label.charAt(0).toUpperCase() + label.slice(1)}
           style={{
-            paddingVertical: 12,
+            paddingVertical: 5,
             backgroundColor: i === selectedIndex ? theme["color-darkest"] : "transparent",
           }}
         />

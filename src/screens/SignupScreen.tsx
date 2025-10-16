@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Layout, Text, useTheme } from "@ui-kitten/components";
 import { signupAPI } from "../api/auth";
 import { addTimedData } from "../core/storage";
-import { StorageKey, Player } from "../types";
+import { LocalStorage, Player } from "../types";
 import { Input } from "../components/Input";
 import { Button } from "../components/Button";
 
@@ -26,7 +26,7 @@ export function SignupScreen({ onSignedIn, goToLogin }: SignupScreenProps) {
     try {
       const result = await signupAPI(email, password);
       const player: Player = result.data;
-      await addTimedData(StorageKey.players, player, 90 * 24 * 60 * 60 * 1000);
+      await addTimedData(LocalStorage.PLAYER, player, 90 * 24 * 60 * 60 * 1000);
       onSignedIn(player);
     } catch (err: any) {
       setError(err.message || "Registration failed");

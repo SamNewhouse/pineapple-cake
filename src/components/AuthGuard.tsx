@@ -1,7 +1,6 @@
-// src/components/AuthGuard.tsx
 import React, { useState, useEffect } from "react";
 import { Layout, Text, Spinner, useTheme } from "@ui-kitten/components";
-import { StorageKey, Player } from "../types";
+import { LocalStorage, Player } from "../types";
 import { getTimedData } from "../core/storage";
 import { LoginScreen } from "../screens/LoginScreen";
 import { SignupScreen } from "../screens/SignupScreen";
@@ -16,7 +15,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const checkPlayer = async () => {
       setLoading(true);
-      const players = await getTimedData<Player>(StorageKey.players);
+      const players = await getTimedData<Player>(LocalStorage.PLAYER);
       const loggedInPlayer =
         Array.isArray(players) && players.length > 0
           ? players.find((p) => p && typeof p.token === "string" && p.token.length > 0)
