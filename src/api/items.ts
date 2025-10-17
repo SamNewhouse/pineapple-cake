@@ -2,13 +2,13 @@ import { httpRequest } from "../core/http";
 import { EXPO_PUBLIC_TUNNEL_URL } from "../core/variables";
 
 // Get all items for a specific player (inventory)
-export function getPlayerItemsAPI(id: string, authToken?: string) {
+export function getPlayerItemsAPI(playerId: string, authToken?: string) {
   const headers: Record<string, string> | undefined = authToken
     ? { Authorization: `Bearer ${authToken}` }
     : undefined;
 
   return httpRequest({
-    url: `${EXPO_PUBLIC_TUNNEL_URL}/dev/player/${id}/items`,
+    url: `${EXPO_PUBLIC_TUNNEL_URL}/dev/player/${playerId}/items`,
     method: "get",
     headers,
   });

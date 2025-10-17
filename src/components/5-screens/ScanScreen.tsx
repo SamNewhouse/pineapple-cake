@@ -7,9 +7,9 @@ import { scanBarcodeAPI } from "../../api/scan";
 import { hasTimedData, addTimedData, clearStorage } from "../../core/storage";
 import { LocalStorage } from "../../types";
 import { log } from "../../core/logging";
-import { STAGE } from "react-native-dotenv";
 import { Loading } from "../Loading";
 import { useRequiredPlayer } from "../../context/GameContext";
+import { EXPO_PUBLIC_STAGE } from "../../core/variables";
 
 export default function ScanScreen() {
   const { player } = useRequiredPlayer();
@@ -20,7 +20,7 @@ export default function ScanScreen() {
 
   const handleBarcodeScan = useCallback(
     async (scanResult: BarcodeScanningResult) => {
-      if (STAGE === "dev") {
+      if (EXPO_PUBLIC_STAGE === "dev") {
         await clearStorage(LocalStorage.BARCODE);
       }
 
@@ -51,7 +51,7 @@ export default function ScanScreen() {
         setScannerLocked(false);
       }
     },
-    [scannerLocked, STAGE, player],
+    [scannerLocked, EXPO_PUBLIC_STAGE, player],
   );
 
   const resetScan = useCallback(() => {

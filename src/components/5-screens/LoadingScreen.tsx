@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { View, Image } from "react-native";
 import { Asset } from "expo-asset";
-import { getCollectablesAPI, getPlayerItemsAPI } from "../../api/items";
+import { fetchPlayerItems, fetchCollectables } from "../../core/auth";
 import { log, logError } from "../../core/logging";
 import { Loading } from "../Loading";
 import { useGame } from "../../context/GameContext";
@@ -14,51 +14,45 @@ export const LoadingScreen: React.FC<Props> = ({ onLoadComplete }) => {
   const { player, setItems, setCollectables } = useGame();
 
   useEffect(() => {
-    if (!player) {
-      log("[SCREEN.loading] No player available, waiting...");
+    if (!player?.id || !player?.token) {
+      log("[LOADING.guard] Player missing or incomplete, skipping preload.");
       return;
     }
-    log("[SCREEN.loading] Player present, starting preload.");
+
+    log("[LOADING.start] --- App Preload Start ---");
 
     const preloadAll = async () => {
       try {
-        log("[SCREEN.loading] Loading asset...");
+        log("[LOADING.asset] Loading app icon asset...");
         const assetPromise = Asset.loadAsync(require("../../../assets/icon.png"));
-        log("[SCREEN.loading] Fetching APIs...");
-        const itemsPromise = getPlayerItemsAPI(player.id, player.token);
-        const collectablesPromise = getCollectablesAPI();
 
-        const [itemsResp, collectablesResp] = await Promise.all([
-          itemsPromise,
-          collectablesPromise,
-        ]);
+        log("[LOADING.items] Fetching player items...");
+        const itemsPromise = fetchPlayerItems(player);
 
-        // Set fetched items in context
-        if (itemsResp?.success && Array.isArray(itemsResp.data?.items)) {
-          setItems(itemsResp.data.items);
-        } else {
-          setItems([]);
-          log("[SCREEN.loading] No player items found or error fetching.");
-        }
+        log("[LOADING.collectables] Fetching collectables...");
+        const collectablesPromise = fetchCollectables();
 
-        // Set fetched collectables in context
-        const collectables = collectablesResp?.data?.items ?? [];
+        const [items, collectables] = await Promise.all([itemsPromise, collectablesPromise]);
+        setItems(items);
         setCollectables(collectables);
-        log("[SCREEN.loading] Collectables sample:", collectables.slice?.(0, 1));
+
+        log(
+          `[LOADING.collectables] loaded: ${collectables.length} (Sample: ${
+            collectables[0]?.name || "none"
+          })`,
+        );
 
         await assetPromise;
-        log("[SCREEN.loading] Asset loaded.");
+        log("[LOADING.asset] Asset loaded.");
       } catch (err) {
-        logError("[SCREEN.loading] Error in preloadAll:", err);
+        logError("[LOADING.error] Error in preloadAll:", err);
       } finally {
-        log("[SCREEN.loading] All done, calling onLoadComplete().");
+        log("[LOADING.end] --- App Preload Complete ---");
         onLoadComplete();
       }
     };
 
     preloadAll();
-    // Only rerun if player changes
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [player]);
 
   return (
