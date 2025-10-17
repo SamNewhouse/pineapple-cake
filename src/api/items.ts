@@ -1,6 +1,5 @@
-import { EXTERNAL_TUNNEL_URL } from "react-native-dotenv";
 import { httpRequest } from "../core/http";
-import { Item, Collectable } from "../types";
+import { EXPO_PUBLIC_EXTERNAL_TUNNEL_URL } from "../core/variables";
 
 // Get all items for a specific player (inventory)
 export function getPlayerItemsAPI(id: string, authToken?: string) {
@@ -9,7 +8,7 @@ export function getPlayerItemsAPI(id: string, authToken?: string) {
     : undefined;
 
   return httpRequest({
-    url: `${EXTERNAL_TUNNEL_URL}/dev/player/${id}/items`,
+    url: `${EXPO_PUBLIC_EXTERNAL_TUNNEL_URL}/dev/player/${id}/items`,
     method: "get",
     headers,
   });
@@ -18,7 +17,7 @@ export function getPlayerItemsAPI(id: string, authToken?: string) {
 // Get details of a specific item by ID
 export function getItemAPI(id: string) {
   return httpRequest({
-    url: `${EXTERNAL_TUNNEL_URL}/dev/item/${id}`,
+    url: `${EXPO_PUBLIC_EXTERNAL_TUNNEL_URL}/dev/item/${id}`,
     method: "get",
   });
 }
@@ -26,7 +25,7 @@ export function getItemAPI(id: string) {
 // Get all catalog items (for reference data)
 export function getCollectablesAPI() {
   return httpRequest({
-    url: `${EXTERNAL_TUNNEL_URL}/dev/collectables`,
+    url: `${EXPO_PUBLIC_EXTERNAL_TUNNEL_URL}/dev/collectables`,
     method: "get",
   });
 }
