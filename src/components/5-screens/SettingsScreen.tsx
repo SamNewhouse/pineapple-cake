@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ScrollView, View } from "react-native";
 import { Layout, Text, useTheme } from "@ui-kitten/components";
-import { Button } from "../components/Button";
-import { LocalStorage } from "../types";
+import { Button } from "../Button";
+import { Collectable, LocalStorage } from "../../types";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useRequiredPlayer } from "../context/PlayerContext";
+import { useRequiredPlayer } from "../../context/GameContext";
 
 interface SettingsScreenProps {
   onSignedOut?: () => void;
@@ -12,18 +12,30 @@ interface SettingsScreenProps {
 
 export default function SettingsScreen({ onSignedOut }: SettingsScreenProps) {
   const theme = useTheme();
-  const player = useRequiredPlayer();
+  const { player, setPlayer } = useRequiredPlayer();
 
-  const devMode = !!player.email && ["test@test.com", "dev@example.com"].includes(player.email);
+  const devMode = ["test@test.com", "dev@example.com"].includes(player.email);
+
+  const [collectables, setCollectables] = useState<Collectable[]>([]);
+
+  useEffect(() => {
+    if (devMode) {
+      AsyncStorage.getItem(LocalStorage.COLLECTABLES).then((stored) => {
+        if (stored) setCollectables(JSON.parse(stored));
+      });
+    }
+  }, [devMode]);
 
   const handleSignOut = async () => {
     await AsyncStorage.removeItem(LocalStorage.PLAYER);
-    console.log("Signed out - Player storage cleared!");
+    setPlayer(null);
+    console.log("Signed out - Player storage and context cleared!");
     if (onSignedOut) onSignedOut();
   };
 
   const handleClearStorage = async () => {
     await AsyncStorage.clear();
+    setPlayer(null);
     console.log("Storage fully cleared!");
     if (onSignedOut) onSignedOut();
   };
@@ -98,7 +110,17 @@ export default function SettingsScreen({ onSignedOut }: SettingsScreenProps) {
             >
               Clear Storage
             </Button>
-            {/* More dev/test controls here */}
+            <Text style={{ marginTop: 24, color: theme["color-text"] }}>Collectables:</Text>
+            {collectables.slice(0, 5).map((c) => (
+              <View key={c.id} style={{ marginBottom: 8 }}>
+                <Text style={{ color: theme["color-info-color"], fontSize: 12 }}>
+                  {c.id} - {c.name}
+                </Text>
+              </View>
+            ))}
+            <Text style={{ color: theme["color-basic-600"], fontSize: 10 }}>
+              Showing {collectables.length} collectables
+            </Text>
           </>
         )}
       </Layout>

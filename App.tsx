@@ -1,52 +1,48 @@
-import React, { useEffect, useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
+import React, { useState } from "react";
 import * as eva from "@eva-design/eva";
-import { ApplicationProvider, IconRegistry, Layout } from "@ui-kitten/components";
+import { ApplicationProvider, IconRegistry } from "@ui-kitten/components";
 import { EvaIconsPack } from "@ui-kitten/eva-icons";
-import TopTabBar from "./src/components/TopTabBar";
-import HomeScreen from "./src/screens/HomeScreen";
-import ScanScreen from "./src/screens/ScanScreen";
-import ItemsScreen from "./src/screens/ItemsScreen";
-import SettingsScreen from "./src/screens/SettingsScreen";
-import { Screen, Player } from "./src/types";
 import scannerTheme from "./src/styling/theme.json";
 import customMapping from "./src/styling/mapping.json";
-import { StatusBar } from "expo-status-bar";
-import { PlayerContext } from "./src/context/PlayerContext";
+import { GameProvider } from "./src/context/GameContext";
+import MainLayout from "./src/components/4-layouts/MainLayout";
+import TopTabBar from "./src/components/TopTabBar";
+import HomeScreen from "./src/components/5-screens/HomeScreen";
+import ScanScreen from "./src/components/5-screens/ScanScreen";
+import ItemsScreen from "./src/components/5-screens/ItemsScreen";
+import SettingsScreen from "./src/components/5-screens/SettingsScreen";
 import { AuthGuard } from "./src/components/AuthGuard";
+import { LoadingScreen } from "./src/components/5-screens/LoadingScreen";
+import { Screen } from "./src/types";
 
 export default function App() {
-  const [player, setPlayer] = useState<Player | null>(null);
+  const [loading, setLoading] = useState(true);
   const [screen, setScreen] = useState<Screen>("home");
 
   return (
-    <PlayerContext.Provider value={{ player, setPlayer }}>
+    <GameProvider>
       <IconRegistry icons={EvaIconsPack} />
       <ApplicationProvider
         {...eva}
         theme={{ ...eva.dark, ...scannerTheme }}
         customMapping={customMapping}
       >
-        <SafeAreaView style={{ flex: 1, backgroundColor: scannerTheme["color-dark"] }}>
+        <MainLayout>
           <AuthGuard>
-            <StatusBar style="light" />
-            <TopTabBar selectedScreen={screen} onTabSelect={setScreen} />
-            <Layout style={{ flex: 1, backgroundColor: scannerTheme["color-dark"] }}>
-              {screen === "home" && <HomeScreen />}
-              {screen === "scan" && <ScanScreen />}
-              {screen === "items" && <ItemsScreen />}
-              {screen === "settings" && (
-                <SettingsScreen
-                  onSignedOut={() => {
-                    setPlayer(null);
-                    setScreen("home");
-                  }}
-                />
-              )}
-            </Layout>
+            {loading ? (
+              <LoadingScreen onLoadComplete={() => setLoading(false)} />
+            ) : (
+              <>
+                <TopTabBar selectedScreen={screen} onTabSelect={setScreen} />
+                {screen === "home" && <HomeScreen />}
+                {screen === "scan" && <ScanScreen />}
+                {screen === "items" && <ItemsScreen />}
+                {screen === "settings" && <SettingsScreen onSignedOut={() => setScreen("home")} />}
+              </>
+            )}
           </AuthGuard>
-        </SafeAreaView>
+        </MainLayout>
       </ApplicationProvider>
-    </PlayerContext.Provider>
+    </GameProvider>
   );
 }

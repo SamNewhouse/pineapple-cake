@@ -6,7 +6,7 @@ export enum LocalStorage {
   BARCODE = "barcode",
   PLAYER = "player",
   SETTING = "setting",
-  COLLECTABLE = "catalog",
+  COLLECTABLES = "collectables",
 }
 
 export enum Tables {

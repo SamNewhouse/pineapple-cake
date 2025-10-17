@@ -22,12 +22,12 @@ export const ItemsList: React.FC<ItemsListProps> = ({
   const theme = useTheme();
 
   const renderItem = ({ item }: { item: Item }) => {
-    const ItemCatalog = collectables.get(item.id);
+    const collectable = collectables.get(item.collectableId);
     return (
       <ItemCard
         item={item}
-        ItemCatalog={ItemCatalog}
-        onPress={() => onItemPress?.(item, ItemCatalog)}
+        collectable={collectable}
+        onPress={() => onItemPress?.(item, collectable)}
       />
     );
   };
