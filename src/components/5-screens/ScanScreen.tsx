@@ -51,7 +51,7 @@ export default function ScanScreen() {
         setScannerLocked(false);
       }
     },
-    [scannerLocked, STAGE, player]
+    [scannerLocked, STAGE, player],
   );
 
   const resetScan = useCallback(() => {

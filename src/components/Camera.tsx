@@ -6,7 +6,7 @@ import { Button } from "./Button";
 
 interface CameraProps {
   onBarcodeScanned: (result: BarcodeScanningResult) => void;
-};
+}
 
 export default function Camera({ onBarcodeScanned }: CameraProps) {
   const [permission, requestPermission] = useCameraPermissions();
