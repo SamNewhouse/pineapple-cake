@@ -5,7 +5,7 @@ import { Player } from "../../types";
 import { Input } from "../Input";
 import { Button } from "../Button";
 import { useGame } from "../../context/GameContext";
-import { handleLoginSuccess, fetchPlayerItems, fetchCollectables } from "../../core/auth";
+import { handleLoginSuccess } from "../../core/auth";
 
 interface LoginScreenProps {
   onSignedIn: (player: Player) => void;

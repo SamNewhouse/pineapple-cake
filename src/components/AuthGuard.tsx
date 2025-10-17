@@ -8,12 +8,11 @@ import { Loading } from "./Loading";
 import { LoadingScreen } from "./5-screens/LoadingScreen";
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
-  const { player, setPlayer, setItems, setCollectables } = useGame();
+  const { player, setPlayer } = useGame();
   const [status, setStatus] = useState<"auth-loading" | "preloading" | "authed">("auth-loading");
   const [authScreen, setAuthScreen] = useState<"login" | "signup">("login");
 
   useEffect(() => {
-    // AUTHGUARD: Attempt to hydrate player from storage
     if (player) {
       setStatus("preloading");
       return;
@@ -27,7 +26,6 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
       if (loggedInPlayer) setPlayer(loggedInPlayer);
       else setStatus("auth-loading");
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [player, setPlayer]);
 
   const handleSignedIn = (playerObj: Player) => {
@@ -36,12 +34,10 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     setStatus("preloading");
   };
 
-  // AUTHGUARD: Loading state for auth or player hydration
   if (status === "auth-loading") {
     return <Loading message="Checking authentication..." />;
   }
 
-  // AUTHGUARD: Not logged in, show login or signup
   if (!player) {
     return authScreen === "login" ? (
       <LoginScreen onSignedIn={handleSignedIn} goToSignup={() => setAuthScreen("signup")} />
@@ -50,7 +46,6 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // AUTHGUARD: Logged in, check for post-login preload
   if (status === "preloading") {
     return <LoadingScreen onLoadComplete={() => setStatus("authed")} />;
   }

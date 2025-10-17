@@ -4,6 +4,7 @@ import { Layout, Text, useTheme } from "@ui-kitten/components";
 import { Button } from "../Button";
 import { useGame, useRequiredPlayer } from "../../context/GameContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { EXPO_PUBLIC_STAGE } from "../../core/variables";
 
 interface SettingsScreenProps {
   onSignedOut?: () => void;
@@ -34,7 +35,7 @@ export default function SettingsScreen({ onSignedOut }: SettingsScreenProps) {
     { label: "Username", value: player.username },
     { label: "Player ID", value: player.id },
     { label: "Email", value: player.email },
-    { label: "Environment", value: process.env.STAGE },
+    { label: "Environment", value: EXPO_PUBLIC_STAGE },
   ];
 
   return (
