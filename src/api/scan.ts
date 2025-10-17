@@ -1,13 +1,11 @@
-import { EXTERNAL_TUNNEL_URL } from "react-native-dotenv";
 import { httpRequest } from "../core/http";
 import { log } from "../core/logging";
-
-const API_URL = `${EXTERNAL_TUNNEL_URL}/dev/scan/process`;
+import { EXPO_PUBLIC_EXTERNAL_TUNNEL_URL } from "../core/variables";
 
 export function scanBarcodeAPI(id: string, barcode: string) {
   log(`[SCAN.api] Scanning barcode: "${barcode}"`);
   return httpRequest({
-    url: API_URL,
+    url: `${EXPO_PUBLIC_EXTERNAL_TUNNEL_URL}/dev/scan/process`,
     method: "post",
     data: {
       id: id,
