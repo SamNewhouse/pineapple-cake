@@ -1,37 +1,51 @@
 import React, { useState } from "react";
 import { Layout, Text, useTheme } from "@ui-kitten/components";
-import { loginAPI } from "../api/auth";
-import { addTimedData } from "../core/storage";
-import { LocalStorage, Player } from "../types";
-import { Input } from "../components/Input";
-import { Button } from "../components/Button";
+import { signupAPI } from "../../api/auth";
+import { addTimedData } from "../../core/storage";
+import { LocalStorage, Player } from "../../types";
+import { Input } from "../Input";
+import { Button } from "../Button";
 
-interface LoginScreenProps {
+interface SignupScreenProps {
   onSignedIn: (player: Player) => void;
-  goToSignup: () => void;
+  goToLogin: () => void;
 }
 
-export function LoginScreen({ onSignedIn, goToSignup }: LoginScreenProps) {
+export function SignupScreen({ onSignedIn, goToLogin }: SignupScreenProps) {
   const theme = useTheme();
   const [error, setError] = useState<string | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  async function handleLogin() {
+  async function handleSignup() {
     setError(null);
     if (!email.trim() || !password.trim()) {
       setError("Please enter both email and password.");
       return;
     }
+    setLoading(true);
     try {
-      const result = await loginAPI(email, password);
+      const result = await signupAPI(email, password);
       const player: Player = result.data;
       await addTimedData(LocalStorage.PLAYER, player, 90 * 24 * 60 * 60 * 1000);
       onSignedIn(player);
     } catch (err: any) {
-      setError(err.message || "Authentication failed");
+      setError(err.message || "Registration failed");
+    } finally {
+      setLoading(false);
     }
   }
+
+  // Optionally clear error on input change
+  const handleEmailChange = (val: string) => {
+    setEmail(val);
+    if (error) setError(null);
+  };
+  const handlePasswordChange = (val: string) => {
+    setPassword(val);
+    if (error) setError(null);
+  };
 
   return (
     <Layout
@@ -60,18 +74,31 @@ export function LoginScreen({ onSignedIn, goToSignup }: LoginScreenProps) {
           color: theme["color-warning"],
         }}
       >
-        Sign in to continue
+        Create a new account
       </Text>
-      <Input theme={theme} placeholder="Email" value={email} onChangeText={setEmail} />
+      <Input
+        theme={theme}
+        placeholder="Email"
+        value={email}
+        onChangeText={handleEmailChange}
+        autoCapitalize="none"
+        keyboardType="email-address"
+        autoComplete="email"
+      />
       <Input
         theme={theme}
         placeholder="Password"
         secureTextEntry
         value={password}
-        onChangeText={setPassword}
+        onChangeText={handlePasswordChange}
+        autoComplete="password"
       />
-      <Button theme={theme} onPress={handleLogin}>
-        Sign In
+      <Button
+        theme={theme}
+        onPress={handleSignup}
+        disabled={loading || !email.trim() || !password.trim()}
+      >
+        {loading ? "Signing Up..." : "Sign Up"}
       </Button>
       <Text
         style={{
@@ -79,9 +106,9 @@ export function LoginScreen({ onSignedIn, goToSignup }: LoginScreenProps) {
           marginBottom: 12,
           fontWeight: "bold",
         }}
-        onPress={goToSignup}
+        onPress={goToLogin}
       >
-        Don't have an account? Sign up
+        Already have an account? Sign in
       </Text>
       {!!error && (
         <Text

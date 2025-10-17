@@ -1,26 +1,26 @@
 import React from "react";
 import { Card, Text, useTheme } from "@ui-kitten/components";
-import { View, TouchableOpacity } from "react-native";
+import { View, Image, TouchableOpacity } from "react-native";
 import { Item, Collectable } from "../types";
 
 interface ItemCardProps {
   item: Item;
-  ItemCatalog?: Collectable;
+  collectable?: Collectable;
   onPress?: () => void;
 }
 
-export const ItemCard: React.FC<ItemCardProps> = ({ item, ItemCatalog, onPress }) => {
+export const ItemCard: React.FC<ItemCardProps> = ({ item, collectable, onPress }) => {
   const theme = useTheme();
 
   return (
-    <View style={{ flex: 1, margin: 5, maxWidth: "50%" }}>
+    <View style={{ flex: 1, margin: 5 }}>
       <TouchableOpacity onPress={onPress} style={{ flex: 1 }}>
         <Card
           style={{
             flex: 1,
             backgroundColor: theme["color-dark"],
             borderWidth: 1,
-            borderColor: ItemCatalog?.rarityColor || theme["color-darkest"],
+            borderColor: theme["color-darkest"],
           }}
         >
           <View
@@ -30,29 +30,29 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, ItemCatalog, onPress }
               minHeight: 100,
             }}
           >
-            <Text
-              category="h6"
-              style={{
-                color: theme["color-text"],
-                fontWeight: "bold",
-                marginBottom: 8,
-                textAlign: "center",
-              }}
-            >
-              {ItemCatalog?.name || `Item ${item.collectableId.slice(-6)}`}
-            </Text>
+            {collectable?.imageUrl && (
+              <Image
+                source={{ uri: collectable.imageUrl }}
+                style={{ width: 56, height: 56, borderRadius: 7, marginBottom: 10 }}
+                resizeMode="contain"
+              />
+            )}
 
-            {ItemCatalog?.rarity && (
+            <Text>{collectable?.name || "Unknown Collectable"}</Text>
+            <Text>{collectable?.description}</Text>
+
+            {/* Rarity display */}
+            {collectable?.rarity && (
               <Text
                 category="c1"
                 style={{
-                  color: ItemCatalog.rarityColor,
+                  color: collectable.rarityColor,
                   fontWeight: "bold",
                   fontSize: 10,
                   marginBottom: 4,
                 }}
               >
-                {ItemCatalog.rarity.toUpperCase()}
+                {collectable.rarity.toUpperCase()}
               </Text>
             )}
 

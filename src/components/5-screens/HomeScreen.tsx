@@ -1,10 +1,10 @@
 import React from "react";
 import { Layout, Text, useTheme } from "@ui-kitten/components";
-import { useRequiredPlayer } from "../context/PlayerContext";
+import { useRequiredPlayer } from "../../context/GameContext";
 
 export default function HomeScreen() {
   const theme = useTheme();
-  const player = useRequiredPlayer();
+  const { player } = useRequiredPlayer();
 
   return (
     <Layout

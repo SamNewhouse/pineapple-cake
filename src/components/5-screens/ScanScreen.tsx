@@ -1,18 +1,18 @@
 import React, { useState, useCallback } from "react";
 import { Layout, useTheme } from "@ui-kitten/components";
-import Camera from "../components/Camera";
+import Camera from "../Camera";
 import { BarcodeScanningResult } from "expo-camera";
-import { ResultView } from "../components/ResultView";
-import { scanBarcodeAPI } from "../api/scan";
-import { hasTimedData, addTimedData, clearStorage } from "../core/storage";
-import { LocalStorage } from "../types";
-import { log } from "../core/logging";
+import { ResultView } from "../ResultView";
+import { scanBarcodeAPI } from "../../api/scan";
+import { hasTimedData, addTimedData, clearStorage } from "../../core/storage";
+import { LocalStorage } from "../../types";
+import { log } from "../../core/logging";
 import { STAGE } from "react-native-dotenv";
-import { useRequiredPlayer } from "../context/PlayerContext";
-import { Loading } from "../components/Loading";
+import { Loading } from "../Loading";
+import { useRequiredPlayer } from "../../context/GameContext";
 
 export default function ScanScreen() {
-  const player = useRequiredPlayer();
+  const { player } = useRequiredPlayer();
   const theme = useTheme();
   const [processing, setProcessing] = useState(false);
   const [result, setResult] = useState<any>(null);
@@ -51,7 +51,7 @@ export default function ScanScreen() {
         setScannerLocked(false);
       }
     },
-    [scannerLocked, STAGE, player],
+    [scannerLocked, STAGE, player]
   );
 
   const resetScan = useCallback(() => {

@@ -3,22 +3,22 @@ import { httpRequest } from "../core/http";
 import { Item, Collectable } from "../types";
 
 // Get all items for a specific player (inventory)
-export function getPlayerItemsAPI(playerId: string, authToken?: string) {
+export function getPlayerItemsAPI(id: string, authToken?: string) {
   const headers: Record<string, string> | undefined = authToken
     ? { Authorization: `Bearer ${authToken}` }
     : undefined;
 
   return httpRequest({
-    url: `${EXTERNAL_TUNNEL_URL}/dev/player/${playerId}/items`,
+    url: `${EXTERNAL_TUNNEL_URL}/dev/player/${id}/items`,
     method: "get",
     headers,
   });
 }
 
 // Get details of a specific item by ID
-export function getItemAPI(itemId: string) {
+export function getItemAPI(id: string) {
   return httpRequest({
-    url: `${EXTERNAL_TUNNEL_URL}/dev/item/${itemId}`,
+    url: `${EXTERNAL_TUNNEL_URL}/dev/item/${id}`,
     method: "get",
   });
 }
