@@ -23,13 +23,11 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-native": "0.81.4",
-    "react-native-dotenv": "3.4.11",
     "react-native-safe-area-context": "5.6.1",
-    "react-native-svg": "15.14.0"
+    "react-native-svg": "15.12.1"
   },
   "devDependencies": {
     "@types/react": "19.1.10",
-    "@types/react-native-dotenv": "0.2.2",
     "@ui-kitten/metro-config": "5.3.1",
     "prettier": "3.6.2",
     "typescript": "5.9.3"

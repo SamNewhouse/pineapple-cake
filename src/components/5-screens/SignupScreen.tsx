@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Layout, Text, useTheme } from "@ui-kitten/components";
 import { signupAPI } from "../../api/auth";
-import { addTimedData } from "../../core/storage";
-import { LocalStorage, Player } from "../../types";
+import { handleLoginSuccess } from "../../core/auth";
 import { Input } from "../Input";
 import { Button } from "../Button";
+import { Player } from "../../types";
 
 interface SignupScreenProps {
   onSignedIn: (player: Player) => void;
@@ -28,8 +28,7 @@ export function SignupScreen({ onSignedIn, goToLogin }: SignupScreenProps) {
     try {
       const result = await signupAPI(email, password);
       const player: Player = result.data;
-      await addTimedData(LocalStorage.PLAYER, player, 90 * 24 * 60 * 60 * 1000);
-      onSignedIn(player);
+      await handleLoginSuccess(player, onSignedIn);
     } catch (err: any) {
       setError(err.message || "Registration failed");
     } finally {
@@ -37,7 +36,7 @@ export function SignupScreen({ onSignedIn, goToLogin }: SignupScreenProps) {
     }
   }
 
-  // Optionally clear error on input change
+  // Clear error when user changes input
   const handleEmailChange = (val: string) => {
     setEmail(val);
     if (error) setError(null);

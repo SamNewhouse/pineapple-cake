@@ -8,6 +8,7 @@ type GameContextType = {
   setItems: React.Dispatch<React.SetStateAction<Item[]>>;
   collectables: Collectable[];
   setCollectables: React.Dispatch<React.SetStateAction<Collectable[]>>;
+  clearGame: () => void;
 };
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -30,9 +31,23 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<Item[]>([]);
   const [collectables, setCollectables] = useState<Collectable[]>([]);
 
+  const clearGame = () => {
+    setPlayer(null);
+    setItems([]);
+    setCollectables([]);
+  };
+
   return (
     <GameContext.Provider
-      value={{ player, setPlayer, items, setItems, collectables, setCollectables }}
+      value={{
+        player,
+        setPlayer,
+        items,
+        setItems,
+        collectables,
+        setCollectables,
+        clearGame,
+      }}
     >
       {children}
     </GameContext.Provider>

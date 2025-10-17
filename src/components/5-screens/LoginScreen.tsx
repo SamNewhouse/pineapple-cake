@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { Layout, Text, useTheme } from "@ui-kitten/components";
 import { loginAPI } from "../../api/auth";
-import { addTimedData } from "../../core/storage";
-import { LocalStorage, Player } from "../../types";
+import { Player } from "../../types";
 import { Input } from "../Input";
 import { Button } from "../Button";
+import { useGame } from "../../context/GameContext";
+import { handleLoginSuccess } from "../../core/auth";
 
 interface LoginScreenProps {
   onSignedIn: (player: Player) => void;
@@ -17,6 +18,7 @@ export function LoginScreen({ onSignedIn, goToSignup }: LoginScreenProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const { setPlayer } = useGame();
 
   async function handleLogin() {
     setError(null);
@@ -29,12 +31,10 @@ export function LoginScreen({ onSignedIn, goToSignup }: LoginScreenProps) {
     try {
       const result = await loginAPI(email, password);
       const player: Player = result.data;
-      await addTimedData(LocalStorage.PLAYER, player, 90 * 24 * 60 * 60 * 1000);
+      await handleLoginSuccess(player, setPlayer);
       onSignedIn(player);
     } catch (err: any) {
-      // Check for nested API error message
-      const apiError = err?.response?.data?.error || err?.data?.error;
-      setError(apiError || err.message || "Authentication failed");
+      setError(err.message || "Authentication failed");
     } finally {
       setLoading(false);
     }

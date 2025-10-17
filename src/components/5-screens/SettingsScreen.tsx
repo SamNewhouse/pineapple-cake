@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { ScrollView, View } from "react-native";
 import { Layout, Text, useTheme } from "@ui-kitten/components";
 import { Button } from "../Button";
-import { Collectable, LocalStorage } from "../../types";
+import { useGame, useRequiredPlayer } from "../../context/GameContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useRequiredPlayer } from "../../context/GameContext";
+import { EXPO_PUBLIC_STAGE } from "../../core/variables";
 
 interface SettingsScreenProps {
   onSignedOut?: () => void;
@@ -13,21 +13,12 @@ interface SettingsScreenProps {
 export default function SettingsScreen({ onSignedOut }: SettingsScreenProps) {
   const theme = useTheme();
   const { player, setPlayer } = useRequiredPlayer();
+  const { collectables } = useGame();
 
   const devMode = ["test@test.com", "dev@example.com"].includes(player.email);
 
-  const [collectables, setCollectables] = useState<Collectable[]>([]);
-
-  useEffect(() => {
-    if (devMode) {
-      AsyncStorage.getItem(LocalStorage.COLLECTABLES).then((stored) => {
-        if (stored) setCollectables(JSON.parse(stored));
-      });
-    }
-  }, [devMode]);
-
   const handleSignOut = async () => {
-    await AsyncStorage.removeItem(LocalStorage.PLAYER);
+    await AsyncStorage.removeItem("player");
     setPlayer(null);
     console.log("Signed out - Player storage and context cleared!");
     if (onSignedOut) onSignedOut();
@@ -44,7 +35,7 @@ export default function SettingsScreen({ onSignedOut }: SettingsScreenProps) {
     { label: "Username", value: player.username },
     { label: "Player ID", value: player.id },
     { label: "Email", value: player.email },
-    { label: "Environment", value: process.env.STAGE },
+    { label: "Environment", value: EXPO_PUBLIC_STAGE },
   ];
 
   return (
@@ -110,7 +101,9 @@ export default function SettingsScreen({ onSignedOut }: SettingsScreenProps) {
             >
               Clear Storage
             </Button>
-            <Text style={{ marginTop: 24, color: theme["color-text"] }}>Collectables:</Text>
+            <Text style={{ marginTop: 24, color: theme["color-text"] }}>
+              Collectables (context):
+            </Text>
             {collectables.slice(0, 5).map((c) => (
               <View key={c.id} style={{ marginBottom: 8 }}>
                 <Text style={{ color: theme["color-info-color"], fontSize: 12 }}>
