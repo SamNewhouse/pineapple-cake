@@ -15,7 +15,7 @@
 
 #### ✨ Feature Implementation
 
-- [ ] Remove UI Kitten  
+- [x] Remove UI Kitten  
        _Refactor app to remove UI Kitten dependency and use styled-components for all styling._
 - [ ] Create dedicated components  
        _Build and organize separate React Native components for each visual/function block (e.g., ItemCard, Profile, AchievementList, NotificationItem, etc.)._
