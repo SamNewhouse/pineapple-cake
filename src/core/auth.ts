@@ -1,6 +1,6 @@
 import { addTimedData } from "../core/storage";
 import { LocalStorage, Player, Item, Collectable } from "../types";
-import { getPlayerItemsAPI, getCollectablesAPI } from "../api/items";
+import { getCollectablesAPI, getPlayerItemsAPI } from "./api/items";
 import { log } from "./logging";
 
 /**

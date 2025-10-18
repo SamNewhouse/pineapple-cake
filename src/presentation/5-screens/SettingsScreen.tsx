@@ -1,7 +1,6 @@
 import React from "react";
-import { ScrollView, View } from "react-native";
-import { Layout, Text, useTheme } from "@ui-kitten/components";
-import { Button } from "../Button";
+import { ScrollView, View, Text } from "react-native";
+import { Button } from "../1-atoms/Button";
 import { useGame, useRequiredPlayer } from "../../context/GameContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { EXPO_PUBLIC_STAGE } from "../../core/variables";
@@ -11,9 +10,10 @@ interface SettingsScreenProps {
 }
 
 export default function SettingsScreen({ onSignedOut }: SettingsScreenProps) {
-  const theme = useTheme();
   const { player, setPlayer } = useRequiredPlayer();
   const { collectables } = useGame();
+
+  if (!player) return null;
 
   const devMode = ["test@test.com", "dev@example.com"].includes(player.email);
 
@@ -39,32 +39,31 @@ export default function SettingsScreen({ onSignedOut }: SettingsScreenProps) {
   ];
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: theme["color-dark"] }}>
-      <Layout
-        level="2"
+    <ScrollView style={{ flex: 1, backgroundColor: "#1D1D1D" }}>
+      <View
         style={{
           flex: 1,
           justifyContent: "center",
           alignItems: "center",
-          backgroundColor: theme["color-dark"],
+          backgroundColor: "#1D1D1D",
           padding: 24,
         }}
       >
         <Text
-          category="h1"
           style={{
             marginBottom: 20,
-            color: theme["color-text"],
+            color: "#EBEBED",
             fontWeight: "bold",
+            fontSize: 32,
           }}
         >
           Settings
         </Text>
         <Text
-          appearance="hint"
           style={{
             marginBottom: 28,
-            color: theme["color-warning"],
+            color: "#9D8751",
+            fontSize: 16,
           }}
         >
           Review your account & app info
@@ -72,21 +71,21 @@ export default function SettingsScreen({ onSignedOut }: SettingsScreenProps) {
         <View style={{ width: "100%", marginBottom: 24 }}>
           {diagnostics.map((item) => (
             <View key={item.label} style={{ marginBottom: 10 }}>
-              <Text style={{ color: theme["color-text-inactive"], fontWeight: "600" }}>
+              <Text style={{ color: "#6f6f6f", fontWeight: "600", fontSize: 14 }}>
                 {item.label}:
               </Text>
-              <Text style={{ color: theme["color-text"], fontSize: 16 }}>{item.value}</Text>
+              <Text style={{ color: "#EBEBED", fontSize: 16 }}>{item.value}</Text>
             </View>
           ))}
         </View>
-        <Button theme={theme} onPress={handleSignOut} style={{ width: "100%", marginTop: 8 }}>
+        <Button onPress={handleSignOut} style={{ width: "100%", marginTop: 8 }}>
           Sign Out
         </Button>
         {devMode && (
           <>
             <Text
               style={{
-                color: theme["color-info-color"],
+                color: "#517F5F",
                 fontWeight: "bold",
                 fontSize: 16,
                 marginTop: 36,
@@ -94,29 +93,23 @@ export default function SettingsScreen({ onSignedOut }: SettingsScreenProps) {
             >
               Dev Tools
             </Text>
-            <Button
-              theme={theme}
-              onPress={handleClearStorage}
-              style={{ width: "100%", marginTop: 12 }}
-            >
+            <Button onPress={handleClearStorage} style={{ width: "100%", marginTop: 12 }}>
               Clear Storage
             </Button>
-            <Text style={{ marginTop: 24, color: theme["color-text"] }}>
-              Collectables (context):
-            </Text>
+            <Text style={{ marginTop: 24, color: "#EBEBED" }}>Collectables (context):</Text>
             {collectables.slice(0, 5).map((c) => (
               <View key={c.id} style={{ marginBottom: 8 }}>
-                <Text style={{ color: theme["color-info-color"], fontSize: 12 }}>
+                <Text style={{ color: "#517F5F", fontSize: 12 }}>
                   {c.id} - {c.name}
                 </Text>
               </View>
             ))}
-            <Text style={{ color: theme["color-basic-600"], fontSize: 10 }}>
+            <Text style={{ color: "#181A1B", fontSize: 10 }}>
               Showing {collectables.length} collectables
             </Text>
           </>
         )}
-      </Layout>
+      </View>
     </ScrollView>
   );
 }

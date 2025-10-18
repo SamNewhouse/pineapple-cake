@@ -1,6 +1,6 @@
-import { httpRequest } from "../core/http";
-import { log } from "../core/logging";
-import { EXPO_PUBLIC_TUNNEL_URL } from "../core/variables";
+import { httpRequest } from "../http";
+import { log } from "../logging";
+import { EXPO_PUBLIC_TUNNEL_URL } from "../variables";
 
 export function scanBarcodeAPI(id: string, barcode: string) {
   log(`[SCAN.api] Scanning barcode: "${barcode}"`);

@@ -8,14 +8,14 @@
        _Update remaining types: `PlayerToken.playerId` → `PlayerToken.id`, `ScanResult.playerId` → `ScanResult.id`._
 - [x] Scan endpoint error message  
        _Change from "playerId and barcode required" to "id and barcode required"._
-- [ ] Update ItemCard width
+- [x] Update ItemCard width
       _overlaps when only one in two column grid_
 - [x] Complete collectable LocalStorage  
        _When a Player views the Items page, check LocalStorage.COLLECTABLE for the collectableId first. If it doesn't exist, fetch the collectable from the API and store it._
 
 #### ✨ Feature Implementation
 
-- [ ] Remove UI Kitten  
+- [x] Remove UI Kitten  
        _Refactor app to remove UI Kitten dependency and use styled-components for all styling._
 - [ ] Create dedicated components  
        _Build and organize separate React Native components for each visual/function block (e.g., ItemCard, Profile, AchievementList, NotificationItem, etc.)._

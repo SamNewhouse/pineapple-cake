@@ -1,5 +1,5 @@
-import { httpRequest } from "../core/http";
-import { EXPO_PUBLIC_TUNNEL_URL } from "../core/variables";
+import { httpRequest } from "../http";
+import { EXPO_PUBLIC_TUNNEL_URL } from "../variables";
 
 // Get all items for a specific player (inventory)
 export function getPlayerItemsAPI(playerId: string, authToken?: string) {

@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { Layout, Text, useTheme } from "@ui-kitten/components";
-import { loginAPI } from "../../api/auth";
+import { View, Text } from "react-native";
 import { Player } from "../../types";
-import { Input } from "../Input";
-import { Button } from "../Button";
+import { Input } from "../1-atoms/Input";
+import { Button } from "../1-atoms/Button";
 import { useGame } from "../../context/GameContext";
 import { handleLoginSuccess } from "../../core/auth";
+import { loginAPI } from "../../core/api/auth";
 
 interface LoginScreenProps {
   onSignedIn: (player: Player) => void;
@@ -13,7 +13,6 @@ interface LoginScreenProps {
 }
 
 export function LoginScreen({ onSignedIn, goToSignup }: LoginScreenProps) {
-  const theme = useTheme();
   const [error, setError] = useState<string | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -40,7 +39,6 @@ export function LoginScreen({ onSignedIn, goToSignup }: LoginScreenProps) {
     }
   }
 
-  // Optionally clear error on input change
   const handleEmailChange = (val: string) => {
     setEmail(val);
     if (error) setError(null);
@@ -51,36 +49,36 @@ export function LoginScreen({ onSignedIn, goToSignup }: LoginScreenProps) {
   };
 
   return (
-    <Layout
-      level="2"
+    <View
       style={{
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: theme["color-dark"],
+        backgroundColor: "#1D1D1D",
       }}
     >
       <Text
-        category="h1"
         style={{
           marginBottom: 20,
-          color: theme["color-text"],
+          color: "#EBEBED",
           fontWeight: "bold",
+          fontSize: 32,
+          textAlign: "center",
         }}
       >
         Pineapple Cake
       </Text>
       <Text
-        appearance="hint"
         style={{
           marginBottom: 40,
-          color: theme["color-warning"],
+          color: "#9D8751",
+          fontSize: 16,
+          textAlign: "center",
         }}
       >
         Sign in to continue
       </Text>
       <Input
-        theme={theme}
         placeholder="Email"
         value={email}
         onChangeText={handleEmailChange}
@@ -89,23 +87,16 @@ export function LoginScreen({ onSignedIn, goToSignup }: LoginScreenProps) {
         autoComplete="email"
       />
       <Input
-        theme={theme}
         placeholder="Password"
         secureTextEntry
         value={password}
         onChangeText={handlePasswordChange}
         autoComplete="password"
       />
-      <Button
-        theme={theme}
-        onPress={handleLogin}
-        disabled={loading || !email.trim() || !password.trim()}
-      >
-        {loading ? "Signing In..." : "Sign In"}
-      </Button>
+      <Button onPress={handleLogin}>{loading ? "Signing In..." : "Sign In"}</Button>
       <Text
         style={{
-          color: theme["color-primary"],
+          color: "#444444",
           marginBottom: 12,
           fontWeight: "bold",
         }}
@@ -117,13 +108,13 @@ export function LoginScreen({ onSignedIn, goToSignup }: LoginScreenProps) {
         <Text
           style={{
             marginBottom: 20,
-            color: theme["color-danger"],
+            color: "#7B4141",
             fontWeight: "bold",
           }}
         >
           {error}
         </Text>
       )}
-    </Layout>
+    </View>
   );
 }
