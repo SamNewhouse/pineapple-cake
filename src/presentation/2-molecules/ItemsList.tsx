@@ -1,8 +1,7 @@
 import React from "react";
-import { FlatList, View } from "react-native";
-import { Text, useTheme } from "@ui-kitten/components";
-import { Item, Collectable } from "../types";
-import { ItemCard } from "./ItemCard";
+import { FlatList, View, Text, Dimensions } from "react-native";
+import { Item, Collectable } from "../../types";
+import { ItemCard } from "../1-atoms/ItemCard";
 
 interface ItemsListProps {
   items: Item[];
@@ -19,8 +18,6 @@ export const ItemsList: React.FC<ItemsListProps> = ({
   refreshing,
   onRefresh,
 }) => {
-  const theme = useTheme();
-
   const renderItem = ({ item }: { item: Item }) => {
     const collectable = collectables.get(item.collectableId);
     return (
@@ -42,21 +39,21 @@ export const ItemsList: React.FC<ItemsListProps> = ({
       }}
     >
       <Text
-        category="h2"
         style={{
           marginBottom: 20,
-          color: theme["color-text"],
+          color: "#EBEBED",
           fontWeight: "bold",
+          fontSize: 28,
         }}
       >
         No Items Found
       </Text>
       <Text
-        appearance="hint"
         style={{
-          color: theme["color-warning"],
+          color: "#9D8751",
           textAlign: "center",
           paddingHorizontal: 40,
+          fontSize: 14,
         }}
       >
         Start scanning to collect items!
@@ -70,13 +67,16 @@ export const ItemsList: React.FC<ItemsListProps> = ({
       renderItem={renderItem}
       keyExtractor={(item) => item.id}
       numColumns={2}
+      initialNumToRender={6}
+      columnWrapperStyle={{ gap: 8, marginBottom: 8 }}
+      contentContainerStyle={{ paddingVertical: 8 }}
       ListEmptyComponent={renderEmpty}
       refreshing={refreshing}
       onRefresh={onRefresh}
       style={{
-        backgroundColor: theme["color-dark"],
+        backgroundColor: "#1D1D1D",
+        padding: 8,
       }}
-      contentContainerStyle={items.length === 0 ? { flex: 1 } : { padding: 8 }}
     />
   );
 };

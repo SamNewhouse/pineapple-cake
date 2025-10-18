@@ -1,10 +1,9 @@
 import React, { useMemo } from "react";
-import { Layout, useTheme } from "@ui-kitten/components";
-import { ItemsList } from "../ItemsList";
+import { View } from "react-native";
 import { useGame } from "../../context/GameContext";
+import { ItemsList } from "../2-molecules/ItemsList";
 
 export default function ItemsScreen() {
-  const theme = useTheme();
   const { items, collectables } = useGame();
 
   const collectablesMap = useMemo(
@@ -13,11 +12,10 @@ export default function ItemsScreen() {
   );
 
   return (
-    <Layout
-      level="2"
+    <View
       style={{
         flex: 1,
-        backgroundColor: theme["color-dark"],
+        backgroundColor: "#1D1D1D",
       }}
     >
       <ItemsList
@@ -27,6 +25,6 @@ export default function ItemsScreen() {
         refreshing={false}
         onRefresh={() => {}}
       />
-    </Layout>
+    </View>
   );
 }

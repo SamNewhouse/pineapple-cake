@@ -1,6 +1,7 @@
 import React from "react";
-import { Layout, Text, Button, useTheme } from "@ui-kitten/components";
-import { ScanResult } from "../types";
+import { View, Text } from "react-native";
+import { ScanResult } from "../../types";
+import { Button } from "../1-atoms/Button";
 
 interface ResultViewProps {
   result: ScanResult;
@@ -8,78 +9,70 @@ interface ResultViewProps {
 }
 
 export function ResultView({ result, resetScan }: ResultViewProps) {
-  const theme = useTheme();
-
-  // Handle error case
   if (result.error) {
     return (
-      <Layout
-        level="2"
+      <View
         style={{
           flex: 1,
           justifyContent: "center",
           alignItems: "center",
-          backgroundColor: theme["color-dark"],
+          backgroundColor: "#1D1D1D",
         }}
       >
         <Text
-          category="h2"
           style={{
             marginBottom: 20,
-            color: theme["color-danger"],
+            color: "#7B4141",
             fontWeight: "bold",
             textAlign: "center",
+            fontSize: 28,
           }}
         >
           Scan Failed
         </Text>
         <Text
-          appearance="hint"
           style={{
             marginBottom: 20,
-            color: theme["color-warning"],
+            color: "#9D8751",
             textAlign: "center",
             paddingHorizontal: 20,
+            fontSize: 14,
           }}
         >
           {result.error?.message || "Something went wrong"}
         </Text>
         <Button
-          status="primary"
           onPress={resetScan}
           style={{
-            backgroundColor: theme["color-darkest"],
-            borderColor: theme["color-dark"],
+            backgroundColor: "#171717",
+            borderColor: "#1D1D1D",
             paddingHorizontal: 20,
             paddingVertical: 20,
             marginVertical: "5%",
           }}
-          appearance="filled"
         >
           Try Again
         </Button>
-      </Layout>
+      </View>
     );
   }
 
-  // Handle success case
   return (
-    <Layout
-      level="2"
+    <View
       style={{
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: theme["color-dark"],
+        backgroundColor: "#1D1D1D",
       }}
     >
       <Text
-        category="h2"
         style={{
           marginBottom: 20,
-          color: theme["color-text"],
+          color: "#EBEBED",
           fontWeight: "bold",
           textAlign: "center",
+          fontSize: 28,
         }}
       >
         {result.awardedItem?.name ?? "Item Unknown"}
@@ -87,11 +80,11 @@ export function ResultView({ result, resetScan }: ResultViewProps) {
 
       {result.awardedItem?.rarity && (
         <Text
-          category="h4"
           style={{
             marginBottom: 10,
-            color: result.awardedItem.rarityColor || theme["color-warning"],
+            color: result.awardedItem.rarityColor || "#9D8751",
             fontWeight: "bold",
+            fontSize: 20,
           }}
         >
           {result.awardedItem.rarity.toUpperCase()}
@@ -100,11 +93,11 @@ export function ResultView({ result, resetScan }: ResultViewProps) {
 
       {result.awardedItem?.rarityMinChance && result.awardedItem?.rarityMaxChance && (
         <Text
-          appearance="hint"
           style={{
             marginBottom: 20,
-            color: theme["color-warning"],
+            color: "#9D8751",
             textAlign: "center",
+            fontSize: 14,
           }}
         >
           Rarity: {Math.round(result.awardedItem.rarityMinChance * 100)}% -{" "}
@@ -114,10 +107,9 @@ export function ResultView({ result, resetScan }: ResultViewProps) {
 
       {result.foundAt && (
         <Text
-          appearance="hint"
           style={{
             marginBottom: 20,
-            color: theme["color-hint"],
+            color: "#5A5D61",
             fontSize: 12,
           }}
         >
@@ -126,19 +118,17 @@ export function ResultView({ result, resetScan }: ResultViewProps) {
       )}
 
       <Button
-        status="primary"
         onPress={resetScan}
         style={{
-          backgroundColor: theme["color-darkest"],
-          borderColor: theme["color-dark"],
+          backgroundColor: "#171717",
+          borderColor: "#1D1D1D",
           paddingHorizontal: 20,
           paddingVertical: 20,
           marginVertical: "5%",
         }}
-        appearance="filled"
       >
         Scan Another
       </Button>
-    </Layout>
+    </View>
   );
 }

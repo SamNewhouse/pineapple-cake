@@ -1,7 +1,6 @@
 import React from "react";
 import { View, Text } from "react-native";
 import { BarcodeScanningResult, CameraView, useCameraPermissions } from "expo-camera";
-import { useTheme } from "@ui-kitten/components";
 import { Button } from "./Button";
 
 interface CameraProps {
@@ -10,7 +9,6 @@ interface CameraProps {
 
 export default function Camera({ onBarcodeScanned }: CameraProps) {
   const [permission, requestPermission] = useCameraPermissions();
-  const theme = useTheme();
 
   if (!permission) {
     return <View />;
@@ -18,14 +16,10 @@ export default function Camera({ onBarcodeScanned }: CameraProps) {
   if (!permission.granted) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text
-          style={{ color: theme["color-text"], marginBottom: 24, fontSize: 18, fontWeight: "bold" }}
-        >
+        <Text style={{ color: "#EBEBED", marginBottom: 24, fontSize: 18, fontWeight: "bold" }}>
           Camera access is required
         </Text>
-        <Button theme={theme} onPress={requestPermission}>
-          Grant Camera Permission
-        </Button>
+        <Button onPress={requestPermission}>Grant Camera Permission</Button>
       </View>
     );
   }
@@ -38,7 +32,7 @@ export default function Camera({ onBarcodeScanned }: CameraProps) {
           height: 240,
           borderRadius: 8,
           overflow: "hidden",
-          backgroundColor: theme["color-surface"],
+          backgroundColor: "#232527",
           alignItems: "center",
           justifyContent: "center",
         }}
@@ -55,7 +49,7 @@ export default function Camera({ onBarcodeScanned }: CameraProps) {
             left: "10%",
             right: "10%",
             height: 2,
-            backgroundColor: theme["scanner-line-color"],
+            backgroundColor: "#B4BBC3",
             top: "50%",
             borderRadius: 2,
           }}

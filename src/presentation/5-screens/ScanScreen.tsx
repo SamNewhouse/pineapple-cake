@@ -1,19 +1,18 @@
 import React, { useState, useCallback } from "react";
-import { Layout, useTheme } from "@ui-kitten/components";
-import Camera from "../Camera";
+import { View } from "react-native";
+import Camera from "../1-atoms/Camera";
 import { BarcodeScanningResult } from "expo-camera";
-import { ResultView } from "../ResultView";
-import { scanBarcodeAPI } from "../../api/scan";
+import { ResultView } from "../2-molecules/ResultView";
 import { hasTimedData, addTimedData, clearStorage } from "../../core/storage";
 import { LocalStorage } from "../../types";
 import { log } from "../../core/logging";
-import { Loading } from "../Loading";
+import { Loading } from "../1-atoms/Loading";
 import { useRequiredPlayer } from "../../context/GameContext";
 import { EXPO_PUBLIC_STAGE } from "../../core/variables";
+import { scanBarcodeAPI } from "../../core/api/scan";
 
 export default function ScanScreen() {
   const { player } = useRequiredPlayer();
-  const theme = useTheme();
   const [processing, setProcessing] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [scannerLocked, setScannerLocked] = useState(false);
@@ -69,8 +68,8 @@ export default function ScanScreen() {
   }
 
   return (
-    <Layout style={{ flex: 1, backgroundColor: theme["color-dark"] }}>
+    <View style={{ flex: 1, backgroundColor: "#1D1D1D" }}>
       <Camera onBarcodeScanned={handleBarcodeScan} />
-    </Layout>
+    </View>
   );
 }
