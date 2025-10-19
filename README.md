@@ -62,11 +62,10 @@ npm install
 
 1. **Environment:**  
    Create a `.env` file and set your backend API URL:  
-```
 
+```
 API_URL=https://your-backend-url.com
 STAGE=development
-
 ```
 
 2. **Run App:**
