@@ -14,43 +14,45 @@ export default function TopTabBar({
   const selectedIndex = tabLabels.indexOf(selectedScreen);
 
   return (
-    <View style={styles.bar}>
-      {tabLabels.map((label, i) => (
-        <TouchableOpacity
-          key={label}
-          style={[styles.tab, i === selectedIndex && styles.selectedTab]}
-          onPress={() => onTabSelect(tabLabels[i])}
-        >
-          <Text style={[styles.tabText, i === selectedIndex && styles.selectedText]}>
-            {label.charAt(0).toUpperCase() + label.slice(1)}
-          </Text>
-        </TouchableOpacity>
-      ))}
+    <View style={styles.topBar}>
+      <View style={styles.bar}>
+        {tabLabels.map((label, i) => (
+          <TouchableOpacity
+            key={label}
+            style={[styles.tab, i === selectedIndex && styles.selectedTab]}
+            onPress={() => onTabSelect(tabLabels[i])}
+          >
+            <Text style={[styles.tabText, i === selectedIndex && styles.selectedText]}>
+              {label.charAt(0).toUpperCase() + label.slice(1)}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  topBar: {},
   bar: {
     flexDirection: "row",
-    backgroundColor: "#1D1D1D",
     paddingVertical: 0,
     justifyContent: "space-around",
   },
   tab: {
     flex: 1,
-    paddingVertical: 10,
+    paddingVertical: 14,
     alignItems: "center",
     backgroundColor: "transparent",
   },
   selectedTab: {
     backgroundColor: "#171717",
-    borderRadius: 2,
+    borderRadius: 0,
   },
   tabText: {
     color: "#6f6f6f",
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: "bold",
   },
   selectedText: {
     color: "#EBEBED",
