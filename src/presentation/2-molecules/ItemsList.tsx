@@ -41,14 +41,13 @@ export const ItemsList: React.FC<ItemsListProps> = ({
       data={hydratedItems}
       renderItem={renderItem}
       keyExtractor={(item) => item.item.id}
-      numColumns={2}
-      initialNumToRender={6}
-      columnWrapperStyle={{ gap: 8, marginBottom: 8 }}
-      contentContainerStyle={{ paddingVertical: 8 }}
+      numColumns={3}
+      columnWrapperStyle={{ gap: 6, marginBottom: 6 }}
+      contentContainerStyle={{ paddingVertical: 4 }}
       ListEmptyComponent={renderEmpty}
       refreshing={refreshing}
       onRefresh={onRefresh}
-      style={{ backgroundColor: "#1D1D1D", padding: 8 }}
+      style={{ backgroundColor: "#1D1D1D", padding: 6 }}
     />
   );
 };
