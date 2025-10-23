@@ -3,12 +3,12 @@ import { View } from "react-native";
 import Camera from "../1-atoms/Camera";
 import { BarcodeScanningResult } from "expo-camera";
 import { ResultView } from "../2-molecules/ResultView";
-import { hasTimedData, addTimedData, clearStorage } from "../../core/storage";
+import { hasTimedData, addTimedData, clearStorage } from "../../lib/storage";
 import { LocalStorage } from "../../types";
-import { log } from "../../core/logging";
+import { log } from "../../lib/logging";
 import { Loading } from "../1-atoms/Loading";
 import { useRequiredPlayer } from "../../context/GameContext";
-import { EXPO_PUBLIC_STAGE } from "../../core/variables";
+import { EXPO_PUBLIC_STAGE } from "../../config/variables";
 import { scanBarcodeAPI } from "../../core/api/scan";
 
 export default function ScanScreen() {

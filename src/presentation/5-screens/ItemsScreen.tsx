@@ -1,26 +1,17 @@
-import React, { useMemo } from "react";
 import { View } from "react-native";
-import { useGame } from "../../context/GameContext";
 import { ItemsList } from "../2-molecules/ItemsList";
+import { Loading } from "../1-atoms/Loading";
+import { useHydratedItems } from "../../core/functions/items";
 
 export default function ItemsScreen() {
-  const { items, collectables } = useGame();
+  const { hydratedItems, ready } = useHydratedItems();
 
-  const collectablesMap = useMemo(
-    () => new Map((collectables || []).map((col) => [col.id, col])),
-    [collectables],
-  );
+  if (!ready) return <Loading />;
 
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: "#1D1D1D",
-      }}
-    >
+    <View style={{ flex: 1, backgroundColor: "#1D1D1D" }}>
       <ItemsList
-        items={items}
-        collectables={collectablesMap}
+        hydratedItems={hydratedItems}
         onItemPress={() => {}}
         refreshing={false}
         onRefresh={() => {}}

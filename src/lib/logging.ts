@@ -1,4 +1,4 @@
-import { EXPO_PUBLIC_STAGE } from "./variables";
+import { EXPO_PUBLIC_STAGE } from "../config/variables";
 
 export function log(...args: any[]) {
   if (EXPO_PUBLIC_STAGE === "dev") {

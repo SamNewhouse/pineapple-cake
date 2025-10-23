@@ -1,61 +1,36 @@
 import React from "react";
-import { FlatList, View, Text, Dimensions } from "react-native";
-import { Item, Collectable } from "../../types";
+import { FlatList, View, Text } from "react-native";
 import { ItemCard } from "../1-atoms/ItemCard";
+import { Item, Collectable, HydratedItem } from "../../types";
 
 interface ItemsListProps {
-  items: Item[];
-  collectables: Map<string, Collectable>;
-  onItemPress?: (item: Item, ItemCatalog?: Collectable) => void;
+  hydratedItems: HydratedItem[];
+  onItemPress?: (item: Item, collectable?: Collectable) => void;
   refreshing?: boolean;
   onRefresh?: () => void;
 }
 
 export const ItemsList: React.FC<ItemsListProps> = ({
-  items,
-  collectables,
+  hydratedItems,
   onItemPress,
   refreshing,
   onRefresh,
 }) => {
-  const renderItem = ({ item }: { item: Item }) => {
-    const collectable = collectables.get(item.collectableId);
-    return (
-      <ItemCard
-        item={item}
-        collectable={collectable}
-        onPress={() => onItemPress?.(item, collectable)}
-      />
-    );
-  };
+  const renderItem = ({ item }: { item: HydratedItem }) => (
+    <ItemCard
+      item={item.item}
+      collectable={item.collectable}
+      rarity={item.rarity}
+      onPress={() => onItemPress?.(item.item, item.collectable)}
+    />
+  );
 
   const renderEmpty = () => (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        paddingVertical: 60,
-      }}
-    >
-      <Text
-        style={{
-          marginBottom: 20,
-          color: "#EBEBED",
-          fontWeight: "bold",
-          fontSize: 28,
-        }}
-      >
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center", paddingVertical: 60 }}>
+      <Text style={{ marginBottom: 20, color: "#EBEBED", fontWeight: "bold", fontSize: 28 }}>
         No Items Found
       </Text>
-      <Text
-        style={{
-          color: "#9D8751",
-          textAlign: "center",
-          paddingHorizontal: 40,
-          fontSize: 14,
-        }}
-      >
+      <Text style={{ color: "#9D8751", textAlign: "center", paddingHorizontal: 40, fontSize: 14 }}>
         Start scanning to collect items!
       </Text>
     </View>
@@ -63,9 +38,9 @@ export const ItemsList: React.FC<ItemsListProps> = ({
 
   return (
     <FlatList
-      data={items}
+      data={hydratedItems}
       renderItem={renderItem}
-      keyExtractor={(item) => item.id}
+      keyExtractor={(item) => item.item.id}
       numColumns={2}
       initialNumToRender={6}
       columnWrapperStyle={{ gap: 8, marginBottom: 8 }}
@@ -73,10 +48,7 @@ export const ItemsList: React.FC<ItemsListProps> = ({
       ListEmptyComponent={renderEmpty}
       refreshing={refreshing}
       onRefresh={onRefresh}
-      style={{
-        backgroundColor: "#1D1D1D",
-        padding: 8,
-      }}
+      style={{ backgroundColor: "#1D1D1D", padding: 8 }}
     />
   );
 };

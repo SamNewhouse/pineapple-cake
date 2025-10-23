@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { LocalStorage, Player } from "../../types";
-import { getTimedData } from "../../core/storage";
+import { AuthenticatedPlayer, LocalStorage, Player } from "../../types";
+import { getData } from "../../lib/storage";
 import { LoginScreen } from "../5-screens/LoginScreen";
 import { SignupScreen } from "../5-screens/SignupScreen";
 import { useGame } from "../../context/GameContext";
@@ -14,27 +14,30 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   const [checkedStorage, setCheckedStorage] = useState(false);
 
   useEffect(() => {
-    if (player) {
-      setStatus("preloading");
+    const checkAuth = async () => {
+      setStatus("auth-loading");
       setCheckedStorage(false);
-      return;
-    }
-    setStatus("auth-loading");
-    setCheckedStorage(false);
-    getTimedData<Player>(LocalStorage.PLAYER).then((players) => {
-      const loggedInPlayer =
-        Array.isArray(players) && players.length > 0
-          ? players.find((p) => p && typeof p.token === "string" && p.token.length > 0)
-          : null;
-      if (loggedInPlayer) {
-        setPlayer(loggedInPlayer);
-      } else {
+
+      try {
+        // Retrieve stored player and token separately
+        const player = await getData<AuthenticatedPlayer>(LocalStorage.PLAYER);
+
+        if (player && player.token) {
+          setPlayer(player);
+          setStatus("preloading");
+        } else {
+          setCheckedStorage(true);
+        }
+      } catch (error) {
+        console.error("[AUTH.guard] Error checking storage:", error);
         setCheckedStorage(true);
       }
-    });
-  }, [player, setPlayer]);
+    };
 
-  const handleSignedIn = (playerObj: Player) => {
+    checkAuth();
+  }, [setPlayer]);
+
+  const handleSignedIn = (playerObj: AuthenticatedPlayer) => {
     setPlayer(playerObj);
     setAuthScreen("login");
     setStatus("preloading");
@@ -60,5 +63,5 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     return <>{children}</>;
   }
 
-  return null;
+  return <LoginScreen onSignedIn={handleSignedIn} goToSignup={() => setAuthScreen("signup")} />;
 }

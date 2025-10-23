@@ -85,10 +85,13 @@ async function setTimedStorageArray<T>(key: StorageKey, arr: TimedStorageData<T>
   await setStorageItem(key, data);
 }
 
-// Public API - Simple key-value storage
 export async function storeData<T>(key: StorageKey, value: T): StorageAction {
+  if (typeof key !== "string" || key.length === 0 || value === null || value === undefined) {
+    logError(`[STORAGE.store] Invalid key/value: key="${key}" value="${value}"`);
+    throw new Error(`storeData called with invalid key or value.`);
+  }
   try {
-    const data = stringifyStorageData(value);
+    const data = JSON.stringify(value);
     await setStorageItem(key, data);
     log(`[STORAGE.store] Data stored in "${key}"`);
   } catch (error) {

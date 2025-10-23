@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { View, Text } from "react-native";
-import { handleLoginSuccess } from "../../core/auth";
 import { Input } from "../1-atoms/Input";
 import { Button } from "../1-atoms/Button";
-import { Player } from "../../types";
+import { AuthenticatedPlayer } from "../../types";
 import { signupAPI } from "../../core/api/auth";
+import { handleLoginSuccess } from "../../core/functions/auth";
 
 interface SignupScreenProps {
-  onSignedIn: (player: Player) => void;
+  onSignedIn: (player: AuthenticatedPlayer) => void;
   goToLogin: () => void;
 }
 
@@ -19,15 +19,23 @@ export function SignupScreen({ onSignedIn, goToLogin }: SignupScreenProps) {
 
   async function handleSignup() {
     setError(null);
+
     if (!email.trim() || !password.trim()) {
       setError("Please enter both email and password.");
       return;
     }
+
     setLoading(true);
     try {
-      const result = await signupAPI(email, password);
-      const player: Player = result.data;
-      await handleLoginSuccess(player, onSignedIn);
+      const player: AuthenticatedPlayer = await signupAPI(email, password);
+
+      if (!player?.id || !player.token) {
+        throw new Error("Invalid server response — missing player or token.");
+      }
+
+      await handleLoginSuccess(player);
+
+      onSignedIn(player);
     } catch (err: any) {
       setError(err.message || "Registration failed");
     } finally {
@@ -39,6 +47,7 @@ export function SignupScreen({ onSignedIn, goToLogin }: SignupScreenProps) {
     setEmail(val);
     if (error) setError(null);
   };
+
   const handlePasswordChange = (val: string) => {
     setPassword(val);
     if (error) setError(null);
@@ -101,15 +110,7 @@ export function SignupScreen({ onSignedIn, goToLogin }: SignupScreenProps) {
         Already have an account? Sign in
       </Text>
       {!!error && (
-        <Text
-          style={{
-            marginBottom: 20,
-            color: "#7B4141",
-            fontWeight: "bold",
-          }}
-        >
-          {error}
-        </Text>
+        <Text style={{ marginBottom: 20, color: "#7B4141", fontWeight: "bold" }}>{error}</Text>
       )}
     </View>
   );

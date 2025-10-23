@@ -1,14 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text } from "react-native";
-import { Player } from "../../types";
+import { AuthenticatedPlayer, Player } from "../../types";
 import { Input } from "../1-atoms/Input";
 import { Button } from "../1-atoms/Button";
 import { useGame } from "../../context/GameContext";
-import { handleLoginSuccess } from "../../core/auth";
 import { loginAPI } from "../../core/api/auth";
+import { getData } from "../../lib/storage";
+import { LocalStorage } from "../../types";
+import { handleLoginSuccess } from "../../core/functions/auth";
 
 interface LoginScreenProps {
-  onSignedIn: (player: Player) => void;
+  onSignedIn: (player: AuthenticatedPlayer) => void;
   goToSignup: () => void;
 }
 
@@ -19,6 +21,22 @@ export function LoginScreen({ onSignedIn, goToSignup }: LoginScreenProps) {
   const [loading, setLoading] = useState(false);
   const { setPlayer } = useGame();
 
+  useEffect(() => {
+    const checkStoredPlayer = async () => {
+      try {
+        const storedPlayer = await getData<AuthenticatedPlayer>(LocalStorage.PLAYER);
+        if (storedPlayer?.token) {
+          setPlayer(storedPlayer);
+          onSignedIn(storedPlayer);
+        }
+      } catch (e) {
+        console.warn("[LoginScreen] Failed to retrieve stored token", e);
+      }
+    };
+    checkStoredPlayer();
+  }, [setPlayer, onSignedIn]);
+
+  // Manual login
   async function handleLogin() {
     setError(null);
 
@@ -26,11 +44,16 @@ export function LoginScreen({ onSignedIn, goToSignup }: LoginScreenProps) {
       setError("Please enter both email and password.");
       return;
     }
+
     setLoading(true);
     try {
-      const result = await loginAPI(email, password);
-      const player: Player = result.data;
-      await handleLoginSuccess(player, setPlayer);
+      const player = await loginAPI(email, password);
+
+      if (!player?.id || !player.token) {
+        throw new Error("Invalid server response — missing player or token.");
+      }
+
+      await handleLoginSuccess(player);
       onSignedIn(player);
     } catch (err: any) {
       setError(err.message || "Authentication failed");
@@ -43,6 +66,7 @@ export function LoginScreen({ onSignedIn, goToSignup }: LoginScreenProps) {
     setEmail(val);
     if (error) setError(null);
   };
+
   const handlePasswordChange = (val: string) => {
     setPassword(val);
     if (error) setError(null);
@@ -68,14 +92,7 @@ export function LoginScreen({ onSignedIn, goToSignup }: LoginScreenProps) {
       >
         Pineapple Cake
       </Text>
-      <Text
-        style={{
-          marginBottom: 40,
-          color: "#9D8751",
-          fontSize: 16,
-          textAlign: "center",
-        }}
-      >
+      <Text style={{ marginBottom: 40, color: "#9D8751", fontSize: 16, textAlign: "center" }}>
         Sign in to continue
       </Text>
       <Input
@@ -93,27 +110,13 @@ export function LoginScreen({ onSignedIn, goToSignup }: LoginScreenProps) {
         onChangeText={handlePasswordChange}
         autoComplete="password"
       />
+
       <Button onPress={handleLogin}>{loading ? "Signing In..." : "Sign In"}</Button>
-      <Text
-        style={{
-          color: "#444444",
-          marginBottom: 12,
-          fontWeight: "bold",
-        }}
-        onPress={goToSignup}
-      >
+      <Text style={{ color: "#444444", marginBottom: 12, fontWeight: "bold" }} onPress={goToSignup}>
         Don't have an account? Sign up
       </Text>
       {!!error && (
-        <Text
-          style={{
-            marginBottom: 20,
-            color: "#7B4141",
-            fontWeight: "bold",
-          }}
-        >
-          {error}
-        </Text>
+        <Text style={{ marginBottom: 20, color: "#7B4141", fontWeight: "bold" }}>{error}</Text>
       )}
     </View>
   );

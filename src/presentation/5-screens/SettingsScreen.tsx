@@ -1,9 +1,12 @@
 import React from "react";
 import { ScrollView, View, Text } from "react-native";
 import { Button } from "../1-atoms/Button";
-import { useGame, useRequiredPlayer } from "../../context/GameContext";
+import { useRequiredPlayer } from "../../context/GameContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { EXPO_PUBLIC_STAGE } from "../../core/variables";
+import { EXPO_PUBLIC_STAGE } from "../../config/variables";
+import { useStaticData } from "../../context/StaticDataContext";
+import { LocalStorage } from "../../types";
+import { clearStorage } from "../../lib/storage";
 
 interface SettingsScreenProps {
   onSignedOut?: () => void;
@@ -11,23 +14,23 @@ interface SettingsScreenProps {
 
 export default function SettingsScreen({ onSignedOut }: SettingsScreenProps) {
   const { player, setPlayer } = useRequiredPlayer();
-  const { collectables } = useGame();
+  const { collectables, ready } = useStaticData();
 
   if (!player) return null;
 
   const devMode = ["test@test.com", "dev@example.com"].includes(player.email);
 
+  // Simple log out (standard flow)
   const handleSignOut = async () => {
-    await AsyncStorage.removeItem("player");
+    await clearStorage(LocalStorage.PLAYER);
     setPlayer(null);
-    console.log("Signed out - Player storage and context cleared!");
     if (onSignedOut) onSignedOut();
   };
 
+  // Developer reset (full clear)
   const handleClearStorage = async () => {
     await AsyncStorage.clear();
     setPlayer(null);
-    console.log("Storage fully cleared!");
     if (onSignedOut) onSignedOut();
   };
 
@@ -96,17 +99,6 @@ export default function SettingsScreen({ onSignedOut }: SettingsScreenProps) {
             <Button onPress={handleClearStorage} style={{ width: "100%", marginTop: 12 }}>
               Clear Storage
             </Button>
-            <Text style={{ marginTop: 24, color: "#EBEBED" }}>Collectables (context):</Text>
-            {collectables.slice(0, 5).map((c) => (
-              <View key={c.id} style={{ marginBottom: 8 }}>
-                <Text style={{ color: "#517F5F", fontSize: 12 }}>
-                  {c.id} - {c.name}
-                </Text>
-              </View>
-            ))}
-            <Text style={{ color: "#181A1B", fontSize: 10 }}>
-              Showing {collectables.length} collectables
-            </Text>
           </>
         )}
       </View>
