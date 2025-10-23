@@ -1,5 +1,5 @@
-import { httpRequest } from "../http";
-import { EXPO_PUBLIC_TUNNEL_URL } from "../variables";
+import { httpRequest } from "../../lib/http";
+import { EXPO_PUBLIC_TUNNEL_URL } from "../../config/variables";
 
 export function signupAPI(email: string, password: string) {
   return httpRequest({

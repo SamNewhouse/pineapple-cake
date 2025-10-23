@@ -1,13 +1,11 @@
 import React, { createContext, useContext, useState } from "react";
-import { Player, Item, Collectable } from "../types";
+import { Item, Collectable, AuthenticatedPlayer, Rarity } from "../types";
 
 type GameContextType = {
-  player: Player | null;
-  setPlayer: React.Dispatch<React.SetStateAction<Player | null>>;
+  player: AuthenticatedPlayer | null;
+  setPlayer: React.Dispatch<React.SetStateAction<AuthenticatedPlayer | null>>;
   items: Item[];
   setItems: React.Dispatch<React.SetStateAction<Item[]>>;
-  collectables: Collectable[];
-  setCollectables: React.Dispatch<React.SetStateAction<Collectable[]>>;
   clearGame: () => void;
 };
 
@@ -27,14 +25,12 @@ export function useRequiredPlayer() {
 }
 
 export function GameProvider({ children }: { children: React.ReactNode }) {
-  const [player, setPlayer] = useState<Player | null>(null);
+  const [player, setPlayer] = useState<AuthenticatedPlayer | null>(null);
   const [items, setItems] = useState<Item[]>([]);
-  const [collectables, setCollectables] = useState<Collectable[]>([]);
 
   const clearGame = () => {
     setPlayer(null);
     setItems([]);
-    setCollectables([]);
   };
 
   return (
@@ -44,8 +40,6 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         setPlayer,
         items,
         setItems,
-        collectables,
-        setCollectables,
         clearGame,
       }}
     >

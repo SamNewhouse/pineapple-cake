@@ -2,10 +2,27 @@ export type Screen = "home" | "scan" | "items" | "trade" | "settings";
 
 export type HttpMethod = "get" | "post" | "put" | "delete" | "patch";
 
+export interface HttpRequestOptions {
+  url: string;
+  method?: HttpMethod;
+  data?: any;
+  params?: Record<string, any>;
+  headers?: Record<string, string>;
+  timeout?: number;
+}
+
+export interface HttpRequestError {
+  message: string;
+  status?: number;
+  data?: any;
+  isAxiosError?: boolean;
+}
+
 export enum LocalStorage {
   BARCODE = "barcode",
   PLAYER = "player",
   SETTING = "setting",
+  RARITIES = "rarities",
   COLLECTABLES = "collectables",
 }
 
@@ -14,12 +31,16 @@ export enum Tables {
   Collectables = "Collectables",
   Players = "Players",
   Trades = "Trades",
+  Rarities = "Rarities",
+  Achievements = "Achievements",
 }
 
 export interface Item {
   id: string;
-  collectableId: string;
   playerId: string;
+  collectableId: string;
+  quality: number;
+  chance: number;
   foundAt: string;
 }
 
@@ -28,10 +49,22 @@ export interface Collectable {
   name: string;
   description: string;
   rarity: string;
-  rarityChance: number;
-  rarityColor: string;
   imageUrl?: string;
   createdAt: string;
+}
+
+export interface Rarity {
+  id: string;
+  name: string;
+  minChance: number;
+  maxChance: number;
+  color: string;
+}
+
+export interface HydratedItem {
+  item: Item;
+  collectable: Collectable;
+  rarity: Rarity;
 }
 
 export enum TradeStatus {
@@ -49,9 +82,7 @@ export interface Trade {
   requestedItemIds: string[];
   status: TradeStatus;
   createdAt: string;
-  completedAt?: string;
-  rejectedAt?: string;
-  cancelledAt?: string;
+  resolvedAt?: string;
 }
 
 export interface Player {
@@ -60,22 +91,24 @@ export interface Player {
   username: string;
   totalScans: number;
   createdAt: string;
-  token?: string;
-  passwordHash?: string;
+  passwordHash: string;
+  achievements?: string[];
 }
 
-export interface PlayerToken {
-  playerId: string;
-  email: string;
-  username: string;
-  iat: number;
-  exp?: number;
+export interface AuthenticatedPlayer extends Omit<Player, "passwordHash"> {
+  token: string;
+}
+
+export interface Achievement {
+  id: string;
+  name: string;
+  description: string;
+  iconUrl?: string;
+  createdAt: string;
 }
 
 export interface AwardedItem extends Collectable {
-  collectableId?: string;
-  rarityMinChance?: number;
-  rarityMaxChance?: number;
+  collectableId: string;
 }
 
 export interface ScanResult {

@@ -1,28 +1,38 @@
 import React, { useEffect, useState } from "react";
 import { View, Image, ActivityIndicator, TouchableOpacity, Text, Dimensions } from "react-native";
-import { Item, Collectable } from "../../types";
+import { Item, Collectable, Rarity } from "../../types";
 import { LinearGradient } from "expo-linear-gradient";
 
 interface ItemCardProps {
   item: Item;
-  collectable?: Collectable;
+  collectable: Collectable;
+  rarity: Rarity;
   onPress?: () => void;
 }
 
-export const ItemCard: React.FC<ItemCardProps> = ({ item, collectable, onPress }) => {
+export const ItemCard: React.FC<ItemCardProps> = ({ item, collectable, rarity, onPress }) => {
   const screenWidth = Dimensions.get("window").width;
-  const [loading, setLoading] = useState(!!collectable?.imageUrl);
+  const [loading, setLoading] = useState(!!collectable.imageUrl);
   const [loadFailed, setLoadFailed] = useState(false);
 
   useEffect(() => {
-    if (loading && collectable?.imageUrl && !loadFailed) {
+    setLoading(!!collectable.imageUrl);
+    setLoadFailed(false);
+  }, [collectable.imageUrl]);
+
+  useEffect(() => {
+    if (loading && collectable.imageUrl && !loadFailed) {
       const timer = setTimeout(() => {
         setLoading(false);
         setLoadFailed(true);
       }, 5000);
       return () => clearTimeout(timer);
     }
-  }, [loading, collectable?.imageUrl, loadFailed]);
+  }, [loading, collectable.imageUrl, loadFailed]);
+
+  const percent = item.chance * 100;
+  const itemChanceModifier =
+    percent === 0 ? "0.00" : percent < 1 ? percent.toFixed(8) : percent.toFixed(2);
 
   return (
     <View style={{ width: screenWidth / 2 - 12 }}>
@@ -36,9 +46,10 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, collectable, onPress }
           }}
         >
           <LinearGradient
-            colors={[collectable!.rarityColor, "#1D1D1D", "#000000"]}
-            start={{ x: 0.1, y: 0.1 }}
-            end={{ x: 0.9, y: 0.9 }}
+            colors={[rarity.color, "#101010"]}
+            locations={[0, 0.6]}
+            start={{ x: 0.2, y: 0.07 }}
+            end={{ x: 0.8, y: 0.93 }}
             style={{
               flex: 1,
               borderRadius: 5,
@@ -51,8 +62,11 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, collectable, onPress }
                 minHeight: 100,
               }}
             >
-              <Text style={{ color: "#EBEBED", fontWeight: "bold", fontSize: 18, marginBottom: 5 }}>
-                {collectable?.name || "Unknown Collectable"}
+              <Text
+                numberOfLines={1}
+                style={{ color: "#EBEBED", fontWeight: "bold", fontSize: 16, marginBottom: 5 }}
+              >
+                {collectable.name}
               </Text>
 
               <View
@@ -63,15 +77,15 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, collectable, onPress }
                 }}
               >
                 {loading ? (
-                  <ActivityIndicator size="small" color="#EBEBED" />
+                  <ActivityIndicator size="large" color="#EBEBED" style={{ height: 76 }} />
                 ) : (
                   <Image
                     source={
-                      !loadFailed && collectable?.imageUrl
+                      !loadFailed && collectable.imageUrl
                         ? { uri: collectable.imageUrl }
                         : require("../../assets/items/sword.png")
                     }
-                    style={{ width: 84, height: 84, borderRadius: 7 }}
+                    style={{ width: 76, height: 76, borderRadius: 3 }}
                     resizeMode="contain"
                     onLoadStart={() => setLoading(true)}
                     onLoadEnd={() => setLoading(false)}
@@ -91,7 +105,7 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, collectable, onPress }
                   fontWeight: "bold",
                 }}
               >
-                Drop Chance: {(collectable!.rarityChance * 100).toFixed(2)}%
+                {itemChanceModifier}%
               </Text>
 
               <View
@@ -104,14 +118,14 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, collectable, onPress }
               >
                 <Text
                   style={{
-                    color: collectable!.rarityColor,
+                    color: rarity.color,
                     fontWeight: "bold",
                     fontSize: 10,
                     marginBottom: 4,
                     textTransform: "uppercase",
                   }}
                 >
-                  {collectable!.rarity.toUpperCase()}
+                  {rarity.name.toUpperCase()}
                 </Text>
                 <Text
                   style={{

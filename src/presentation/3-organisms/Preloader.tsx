@@ -1,20 +1,20 @@
 import React, { useEffect } from "react";
 import { View, Image, StyleSheet, Dimensions } from "react-native";
 import { Asset } from "expo-asset";
-import { fetchPlayerItems, fetchCollectables } from "../../core/auth";
-import { log, logError } from "../../core/logging";
+import { log, logError } from "../../lib/logging";
 import { Loading } from "../1-atoms/Loading";
 import { useGame } from "../../context/GameContext";
+import { getPlayerItemsAPI } from "../../core/api/players";
 
 type Props = {
   onLoadComplete: () => void;
 };
 
 export const Preloader: React.FC<Props> = ({ onLoadComplete }) => {
-  const { player, setItems, setCollectables } = useGame();
+  const { player, setItems } = useGame();
 
   useEffect(() => {
-    if (!player?.id || !player?.token) {
+    if (!player?.id) {
       log("[LOADING.guard] Player missing or incomplete, skipping preload.");
       return;
     }
@@ -23,27 +23,10 @@ export const Preloader: React.FC<Props> = ({ onLoadComplete }) => {
 
     const preloadAll = async () => {
       try {
-        log("[LOADING.asset] Loading app icon asset...");
         const assetPromise = Asset.loadAsync(require("../../../assets/icon.png"));
-
-        log("[LOADING.items] Fetching player items...");
-        const itemsPromise = fetchPlayerItems(player);
-
-        log("[LOADING.collectables] Fetching collectables...");
-        const collectablesPromise = fetchCollectables();
-
-        const [items, collectables] = await Promise.all([itemsPromise, collectablesPromise]);
+        const items = await getPlayerItemsAPI(player.id);
         setItems(items);
-        setCollectables(collectables);
-
-        log(
-          `[LOADING.collectables] loaded: ${collectables.length} (Sample: ${
-            collectables[0]?.name || "none"
-          })`,
-        );
-
         await assetPromise;
-        log("[LOADING.asset] Asset loaded.");
       } catch (err) {
         logError("[LOADING.error] Error in preloadAll:", err);
       } finally {
