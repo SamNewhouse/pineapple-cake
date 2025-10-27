@@ -2,47 +2,51 @@
 
 # 🍰 Pineapple Cake
 
-A React Native mobile app built with Expo, designed as the frontend for the Pineapple Donut backend—collect, trade, and manage virtual items in a playful game ecosystem.
+A React Native mobile game built with Expo, designed as the frontend for the Pineapple Donut backend—collect, trade, and manage virtual items in a playful game ecosystem.
+
+---
 
 ## 📱 About
 
 Pineapple Cake lets users:
 
-- **Scan items** with the device camera  
-- **Collect items** in their inventory  
-- **Trade with other players**  _TODO_
-- **Authenticate securely**
+- **Scan items** (barcodes + physical items) with device camera, using advanced scan probability logic and anti-repeat safety
+- **Collect items** in their inventory, with hydrated metadata, rarity, and state consistency
+- **Trade with other players** _(feature in progress)_
+- **Authenticate securely (Google/JWT)_
+- Seamless sync with Pineapple Donut serverless backend (AWS Lambda/DynamoDB)
 
-Seamlessly connects to the Pineapple Donut serverless backend (AWS Lambda/DynamoDB).
+---
 
 ## 🛠️ Tech Stack
 
-- **Framework:** React Native (0.81.4) · Expo SDK 54
-- **Language:** TypeScript 5.9.3  
-- **State:** Context API  
-- **HTTP:** Axios  
+- **Framework:** React Native (0.81.4), Expo SDK 54
+- **Language:** TypeScript 5.9.3
+- **State:** Context API
+- **HTTP:** Axios
 - **Auth:** JWT token
-- **Camera:** Expo Camera  
+- **Camera:** Expo Camera (+ new probability/scan engine)
 - **Storage:** AsyncStorage
+
+---
 
 ## 📂 Project Structure
 
-```bash
 src/
-├── assets/                # Images, icons, and other static assets
-│   └── items/             # Item-specific images (e.g., item sprites)
-├── context/               # React Context providers for global state
-├── core/                  # Core utilities and infrastructure (API, auth, storage, etc.)
-│   ├── api/               # API communication modules
-│   ├── (other core utils) # Logging, variables, storage, etc.
-├── presentation/          # All UI presentation logic and components
-│   ├── 1-atoms/           # Base UI elements (Button, Input, etc.)
-│   ├── 2-molecules/       # Composed UI elements (lists, result views, etc.)
-│   ├── 3-organisms/       # Larger composed UI (preloaders, forms)
-│   ├── 4-layouts/         # Page layouts and guards
-│   └── 5-screens/         # Main application screens (pages)
-└── types/                 # TypeScript type definitions shared across app
-```
+├── assets/              # Images, icons, and static assets
+│   └── items/           # Item-specific images (sprites, etc.)
+├── context/             # React Context providers for global state (Game, StaticData, Auth, etc.)
+├── core/                # Core utils: api/, auth/, storage/, scan.ts (scan logic), logging, etc.
+│   └── api/             # API communication modules (players, items, trades, etc.)
+├── presentation/
+│   ├── 1-atoms/         # Base UI (Button, Input, Camera, Loading)
+│   ├── 2-molecules/     # Composed UI (ResultView, filtered lists, etc.)
+│   ├── 3-organisms/     # Larger UI (forms, preloaders)
+│   ├── 4-layouts/       # Page layouts (AuthGuard, MainLayout, etc.)
+│   └── 5-screens/       # Main screens (Inventory, Login, etc.)
+└── types/               # Shared TypeScript types (Player, Item, etc.)
+
+---
 
 ## 🚀 Getting Started
 
@@ -54,67 +58,62 @@ src/
 
 ### Installation
 
-```bash
 git clone https://github.com/SamNewhouse/pineapple-cake.git
 cd pineapple-cake
 npm install
-```
 
-1. **Environment:**  
-   Create a `.env` file and set your backend API URL:  
-
-```
-API_URL=https://your-backend-url.com
-STAGE=development
-```
+1. **Environment:** Create a `.env` and set backend API URL:
+   API_URL=https://your-backend-url.com
+   STAGE=development
 
 2. **Run App:**
-
-```
-
-npm start          \# Launch Expo Dev Server
-npm run android    \# Android emulator/device
-npm run ios        \# iOS Simulator/device
-npm run web        \# Web browser
-
-```
+   npm start          # Launch Expo Dev Server
+   npm run android    # Android emulator/device
+   npm run ios        # iOS Simulator/device
+   npm run web        # Web browser
 
 3. **Formatting Code:**
+   npm run format
 
-```bash
-npm run format
-```
+---
 
 ## 📱 Features
 
-- **Camera Scanning:** Scan physical items and barcodes
-- **Collectable System:** Manage collection and item details
-- **Trading:** Offer/request/trade items with others
-- **Google Authentication:** Secure sign-in
-- **Cross-Platform:** iOS, Android, Web
+- **Advanced Camera Scanning:** Barcode/item scan logic; probabilistic unlock, anti-repeat, fallback handling
+- **Collectable System:** Hydrated item details, rarity, caching & state sync
+- **Trading:** Offer/request/trade items with others _(in progress)_
+- **Google Authentication**
+- **Cross-Platform:** iOS, Android, Web (Expo)
 - **Offline Support:** Local caching via AsyncStorage
+- **ItemCard UI:** Refined with icons, layout tweaks
+
+---
 
 ## 🔧 Configuration
 
 - `app.json` — Expo config (icon, name, splash, etc.)
 - `eas.json` — Expo build services config
-- `.env` — API endpoint and environment variables
+- `.env` — API endpoint/env
+
 
 ## 📦 Build & Deploy
 
 Build with Expo EAS:
-
-```bash
 eas build --platform all
-```
+
+---
 
 ## 📄 License
 
 This project is private and proprietary.
 
+---
+
 ## 👨‍💻 Author
 
 **Sam Newhouse**
 
-- Website: [www.samnewhouse.co.uk](https://www.samnewhouse.co.uk)
-- GitHub: [@SamNewhouse](https://github.com/SamNewhouse)
+I'm just bored
+
+- Website: www.samnewhouse.co.uk
+- GitHub: @SamNewhouse
