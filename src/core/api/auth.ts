@@ -1,9 +1,9 @@
 import { httpRequest } from "../../lib/http";
-import { EXPO_PUBLIC_TUNNEL_URL } from "../../config/variables";
+import { EXPO_PUBLIC_URL } from "../../config/variables";
 
 export function signupAPI(email: string, password: string) {
   return httpRequest({
-    url: `${EXPO_PUBLIC_TUNNEL_URL}/dev/auth/signup`,
+    url: `${EXPO_PUBLIC_URL}/dev/auth/signup`,
     method: "post",
     data: { email, password },
   });
@@ -11,7 +11,7 @@ export function signupAPI(email: string, password: string) {
 
 export function loginAPI(email: string, password: string) {
   return httpRequest({
-    url: `${EXPO_PUBLIC_TUNNEL_URL}/dev/auth/login`,
+    url: `${EXPO_PUBLIC_URL}/dev/auth/login`,
     method: "post",
     data: { email, password },
   });

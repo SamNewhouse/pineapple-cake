@@ -1,15 +1,13 @@
 import { httpRequest } from "../../lib/http";
 import { log } from "../../lib/logging";
-import { EXPO_PUBLIC_TUNNEL_URL } from "../../config/variables";
+import { EXPO_PUBLIC_URL } from "../../config/variables";
 
-export function scanBarcodeAPI(id: string, barcode: string) {
-  log(`[SCAN.api] Scanning barcode: "${barcode}"`);
+export function scanBarcodeAPI(id: String) {
   return httpRequest({
-    url: `${EXPO_PUBLIC_TUNNEL_URL}/dev/scan/process`,
+    url: `${EXPO_PUBLIC_URL}/dev/scan/process`,
     method: "post",
     data: {
       id: id,
-      barcode: barcode,
     },
   });
 }
