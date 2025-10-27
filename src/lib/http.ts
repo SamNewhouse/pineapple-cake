@@ -1,12 +1,12 @@
 import axios, { AxiosInstance, AxiosError } from "axios";
 import { AuthenticatedPlayer, HttpRequestError, HttpRequestOptions, LocalStorage } from "../types";
-import { EXPO_PUBLIC_TUNNEL_URL } from "../config/variables";
+import { EXPO_PUBLIC_URL } from "../config/variables";
 import { logError, log } from "./logging";
 import { getData } from "./storage";
 
 // Create Axios instance
 const apiClient: AxiosInstance = axios.create({
-  baseURL: EXPO_PUBLIC_TUNNEL_URL,
+  baseURL: EXPO_PUBLIC_URL,
   headers: { "Content-Type": "application/json" },
   timeout: 5000,
 });

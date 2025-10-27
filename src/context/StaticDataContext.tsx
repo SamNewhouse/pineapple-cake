@@ -5,6 +5,8 @@ import { getAllCollectablesAPI } from "../core/api/collectables";
 import { getAllRaritiesAPI } from "../core/api/rarities";
 import { logError } from "../lib/logging";
 
+const STATIC_DATA_TTL = 72 * 60 * 60 * 1000;
+
 type StaticDataContextType = {
   collectables: Collectable[];
   rarities: Rarity[];
@@ -27,6 +29,14 @@ export function StaticDataProvider({ children }: { children: React.ReactNode }) 
   useEffect(() => {
     const loadStaticData = async () => {
       try {
+        const lastSync = await getData("lastStaticDataSync");
+        const now = Date.now();
+        let needsRefresh = true;
+
+        if (lastSync) {
+          needsRefresh = now - Number(lastSync) > STATIC_DATA_TTL;
+        }
+
         const collectablesRaw = await getData(LocalStorage.COLLECTABLES);
         const raritiesRaw = await getData(LocalStorage.RARITIES);
 
@@ -35,7 +45,7 @@ export function StaticDataProvider({ children }: { children: React.ReactNode }) 
           : [];
         const safeRarities = Array.isArray(raritiesRaw) ? (raritiesRaw as Rarity[]) : [];
 
-        if (safeCollectables.length && safeRarities.length) {
+        if (!needsRefresh && safeCollectables.length && safeRarities.length) {
           setCollectables(safeCollectables);
           setRarities(safeRarities);
         } else {
@@ -45,6 +55,7 @@ export function StaticDataProvider({ children }: { children: React.ReactNode }) 
           setRarities(apiRarities);
           await storeData(LocalStorage.COLLECTABLES, apiCollectables);
           await storeData(LocalStorage.RARITIES, apiRarities);
+          await storeData("lastStaticDataSync", String(now));
         }
       } catch (error) {
         logError("[STATIC ERROR] Failed to load static data", error);

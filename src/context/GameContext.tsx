@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState } from "react";
-import { Item, Collectable, AuthenticatedPlayer, Rarity } from "../types";
+import React, { createContext, useContext, useState, useEffect } from "react";
+import { Item, AuthenticatedPlayer } from "../types";
+import { getPlayerItemsAPI } from "../core/api/players";
 
 type GameContextType = {
   player: AuthenticatedPlayer | null;
@@ -27,6 +28,20 @@ export function useRequiredPlayer() {
 export function GameProvider({ children }: { children: React.ReactNode }) {
   const [player, setPlayer] = useState<AuthenticatedPlayer | null>(null);
   const [items, setItems] = useState<Item[]>([]);
+
+  useEffect(() => {
+    if (player?.id) {
+      getPlayerItemsAPI(player.id)
+        .then((fetchedItems) => {
+          setItems(fetchedItems);
+        })
+        .catch((error) => {
+          setItems([]);
+        });
+    } else {
+      setItems([]);
+    }
+  }, [player]);
 
   const clearGame = () => {
     setPlayer(null);

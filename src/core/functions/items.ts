@@ -32,11 +32,11 @@ export function hydrateItem<T extends { collectableId?: string }>(
   itemLike: T,
   collectables: Collectable[],
   rarities: Rarity[],
-): { itemLike: T; collectable: Collectable; rarity: Rarity } | null {
-  if (!itemLike.collectableId) return null;
+): { itemLike: T; collectable: Collectable; rarity: Rarity } {
+  if (!itemLike.collectableId) throw new Error("No collectableId on itemLike");
   const collectable = collectables.find((c) => c.id === itemLike.collectableId);
-  if (!collectable) return null;
+  if (!collectable) throw new Error("Collectable not found:" + itemLike.collectableId);
   const rarity = rarities.find((r) => r.id === collectable.rarity);
-  if (!rarity) return null;
+  if (!rarity) throw new Error("Rarity not found for collectable " + collectable.id);
   return { itemLike, collectable, rarity };
 }

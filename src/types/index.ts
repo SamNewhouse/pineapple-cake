@@ -61,6 +61,14 @@ export interface Rarity {
   color: string;
 }
 
+export interface ScanResult {
+  message: string;
+  success: boolean;
+  awardedItem?: Item;
+  playerId?: string;
+  foundAt?: string;
+}
+
 export interface HydratedItem {
   item: Item;
   collectable: Collectable;
@@ -105,15 +113,4 @@ export interface Achievement {
   description: string;
   iconUrl?: string;
   createdAt: string;
-}
-
-export interface AwardedItem extends Collectable {
-  collectableId: string;
-}
-
-export interface ScanResult {
-  awardedItem?: AwardedItem;
-  playerId?: string;
-  foundAt?: string;
-  error?: any;
 }
