@@ -24,12 +24,7 @@
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "package": "com.samnewhouse.pineapplecake",
-      "permissions": [
-        "INTERNET",
-        "CAMERA",
-        "android.permission.CAMERA",
-        "android.permission.RECORD_AUDIO"
-      ],
+      "permissions": ["INTERNET", "CAMERA", "android.permission.CAMERA"],
       "googleServicesFile": "./google-services.json"
     },
     "web": {
