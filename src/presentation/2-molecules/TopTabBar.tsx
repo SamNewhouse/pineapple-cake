@@ -1,60 +1,28 @@
 import React from "react";
-import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
-import { Screen } from "../../types";
+import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+import ItemsScreen from "../5-screens/ItemsScreen";
+import ScanScreen from "../5-screens/ScanScreen";
+import TradeScreen from "../5-screens/TradeScreen";
+import ProfileScreen from "../5-screens/ProfileScreen";
 
-const tabLabels: Screen[] = ["home", "scan", "items", "trade", "settings"];
+const Tab = createMaterialTopTabNavigator();
 
-export default function TopTabBar({
-  selectedScreen,
-  onTabSelect,
-}: {
-  selectedScreen: Screen;
-  onTabSelect: (screen: Screen) => void;
-}) {
-  const selectedIndex = tabLabels.indexOf(selectedScreen);
-
+export default function TopTabBarNavigator() {
   return (
-    <View style={styles.topBar}>
-      <View style={styles.bar}>
-        {tabLabels.map((label, i) => (
-          <TouchableOpacity
-            key={label}
-            style={[styles.tab, i === selectedIndex && styles.selectedTab]}
-            onPress={() => onTabSelect(tabLabels[i])}
-          >
-            <Text style={[styles.tabText, i === selectedIndex && styles.selectedText]}>
-              {label.charAt(0).toUpperCase() + label.slice(1)}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-    </View>
+    <Tab.Navigator
+      initialRouteName="Items"
+      screenOptions={{
+        tabBarIndicatorStyle: { backgroundColor: "#EBEBED" },
+        tabBarLabelStyle: { fontWeight: "bold", fontSize: 16 },
+        tabBarStyle: { backgroundColor: "#171717" },
+        tabBarActiveTintColor: "#EBEBED",
+        tabBarInactiveTintColor: "#6f6f6f",
+      }}
+    >
+      <Tab.Screen name="Items" component={ItemsScreen} />
+      <Tab.Screen name="Scan" component={ScanScreen} />
+      <Tab.Screen name="Trade" component={TradeScreen} />
+      <Tab.Screen name="Profile" component={ProfileScreen} />
+    </Tab.Navigator>
   );
 }
-
-const styles = StyleSheet.create({
-  topBar: {},
-  bar: {
-    flexDirection: "row",
-    paddingVertical: 0,
-    justifyContent: "space-around",
-  },
-  tab: {
-    flex: 1,
-    paddingVertical: 14,
-    alignItems: "center",
-    backgroundColor: "transparent",
-  },
-  selectedTab: {
-    backgroundColor: "#171717",
-    borderRadius: 0,
-  },
-  tabText: {
-    color: "#6f6f6f",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  selectedText: {
-    color: "#EBEBED",
-  },
-});
