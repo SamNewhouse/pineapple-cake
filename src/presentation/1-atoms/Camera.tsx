@@ -56,7 +56,7 @@ function Camera({ onBarcodeScanned }: CameraProps) {
       <View
         style={{
           width: "90%",
-          height: 240,
+          height: "60%",
           borderRadius: 8,
           overflow: "hidden",
           backgroundColor: "#232527",

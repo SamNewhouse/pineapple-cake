@@ -12,8 +12,8 @@ export default function ScreenLayout() {
   return (
     <AuthGuard>
       <TopTabBar selectedScreen={screen} onTabSelect={setScreen} />
-      {screen === "items" && <ItemsScreen />}
       {screen === "scan" && <ScanScreen />}
+      {screen === "items" && <ItemsScreen />}
       {screen === "trade" && <TradeScreen />}
       {screen === "profile" && <SettingsScreen onSignedOut={() => setScreen("items")} />}
     </AuthGuard>
