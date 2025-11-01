@@ -1,4 +1,4 @@
-export type Screen = "scan" | "items" | "trade" | "profile" | "settings";
+export type Screen = "home" | "scan" | "items" | "trade" | "settings";
 
 export type HttpMethod = "get" | "post" | "put" | "delete" | "patch";
 
@@ -99,10 +99,11 @@ export interface Player {
   username: string;
   totalScans: number;
   createdAt: string;
+  passwordHash: string;
   achievements?: string[];
 }
 
-export interface AuthenticatedPlayer extends Player {
+export interface AuthenticatedPlayer extends Omit<Player, "passwordHash"> {
   token: string;
 }
 

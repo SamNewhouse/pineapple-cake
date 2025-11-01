@@ -14,11 +14,3 @@ export function colorLuminance(hex: string, lum = 0.1) {
 
   return rgb;
 }
-
-export function getColor(seed: string, colors: string[]) {
-  let sum = 0;
-  for (let i = 0; i < seed.length; i++) {
-    sum += seed.charCodeAt(i);
-  }
-  return colors[sum % colors.length];
-}

@@ -16,7 +16,6 @@ export const Preloader: React.FC<Props> = ({ onLoadComplete }) => {
   useEffect(() => {
     if (!player?.id) {
       log("[LOADING.guard] Player missing or incomplete, skipping preload.");
-      onLoadComplete();
       return;
     }
 
@@ -37,7 +36,7 @@ export const Preloader: React.FC<Props> = ({ onLoadComplete }) => {
     };
 
     preloadAll();
-  }, [player, onLoadComplete]);
+  }, [player]);
 
   return (
     <View style={styles.overlay}>

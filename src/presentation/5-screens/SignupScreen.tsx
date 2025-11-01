@@ -5,14 +5,13 @@ import { Button } from "../1-atoms/Button";
 import { AuthenticatedPlayer } from "../../types";
 import { signupAPI } from "../../core/api/auth";
 import { handleLoginSuccess } from "../../core/functions/auth";
-import { StackScreenProps } from "@react-navigation/stack";
-import { AuthStackParamList } from "../4-layouts/navigation/AuthNavigator";
 
-type SignupScreenProps = StackScreenProps<AuthStackParamList, "Signup"> & {
-  setPlayer: (player: AuthenticatedPlayer | null) => void;
-};
+interface SignupScreenProps {
+  onSignedIn: (player: AuthenticatedPlayer) => void;
+  goToLogin: () => void;
+}
 
-export default function SignupScreen({ setPlayer, navigation }: SignupScreenProps) {
+export function SignupScreen({ onSignedIn, goToLogin }: SignupScreenProps) {
   const [error, setError] = useState<string | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -35,13 +34,24 @@ export default function SignupScreen({ setPlayer, navigation }: SignupScreenProp
       }
 
       await handleLoginSuccess(player);
-      setPlayer(player);
+
+      onSignedIn(player);
     } catch (err: any) {
       setError(err.message || "Registration failed");
     } finally {
       setLoading(false);
     }
   }
+
+  const handleEmailChange = (val: string) => {
+    setEmail(val);
+    if (error) setError(null);
+  };
+
+  const handlePasswordChange = (val: string) => {
+    setPassword(val);
+    if (error) setError(null);
+  };
 
   return (
     <View
@@ -76,7 +86,7 @@ export default function SignupScreen({ setPlayer, navigation }: SignupScreenProp
       <Input
         placeholder="Email"
         value={email}
-        onChangeText={setEmail}
+        onChangeText={handleEmailChange}
         autoCapitalize="none"
         keyboardType="email-address"
         autoComplete="email"
@@ -85,7 +95,7 @@ export default function SignupScreen({ setPlayer, navigation }: SignupScreenProp
         placeholder="Password"
         secureTextEntry
         value={password}
-        onChangeText={setPassword}
+        onChangeText={handlePasswordChange}
         autoComplete="password"
       />
       <Button onPress={handleSignup}>{loading ? "Signing Up..." : "Sign Up"}</Button>
@@ -95,7 +105,7 @@ export default function SignupScreen({ setPlayer, navigation }: SignupScreenProp
           marginBottom: 12,
           fontWeight: "bold",
         }}
-        onPress={() => navigation.navigate("Login")}
+        onPress={goToLogin}
       >
         Already have an account? Sign in
       </Text>

@@ -1,21 +1,17 @@
-// GameContext.tsx
-
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { Item, AuthenticatedPlayer } from "../types";
 import { getPlayerItemsAPI } from "../core/api/players";
-import { getData } from "../lib/storage";
-import { LocalStorage } from "../types";
 
 type GameContextType = {
   player: AuthenticatedPlayer | null;
   setPlayer: React.Dispatch<React.SetStateAction<AuthenticatedPlayer | null>>;
   items: Item[];
   setItems: React.Dispatch<React.SetStateAction<Item[]>>;
-  loading: boolean;
   clearGame: () => void;
 };
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
+GameContext.displayName = "GameContext";
 
 export function useGame() {
   const ctx = useContext(GameContext);
@@ -25,36 +21,23 @@ export function useGame() {
 
 export function useRequiredPlayer() {
   const { player, setPlayer } = useGame();
-  if (!player) throw new Error("Player context missing - this screen requires authentication.");
+  if (!player) throw new Error("Tried to use player outside AuthGuard!");
   return { player, setPlayer };
 }
 
 export function GameProvider({ children }: { children: React.ReactNode }) {
   const [player, setPlayer] = useState<AuthenticatedPlayer | null>(null);
   const [items, setItems] = useState<Item[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const loadPlayer = async () => {
-      setLoading(true);
-      const storedPlayer = await getData<AuthenticatedPlayer>(LocalStorage.PLAYER);
-      if (storedPlayer?.token) {
-        setPlayer(storedPlayer);
-      } else {
-        setPlayer(null);
-      }
-      setLoading(false);
-    };
-    loadPlayer();
-  }, []);
 
   useEffect(() => {
     if (player?.id) {
-      setLoading(true);
       getPlayerItemsAPI(player.id)
-        .then((fetchedItems) => setItems(fetchedItems))
-        .catch(() => setItems([]))
-        .finally(() => setLoading(false));
+        .then((fetchedItems) => {
+          setItems(fetchedItems);
+        })
+        .catch((error) => {
+          setItems([]);
+        });
     } else {
       setItems([]);
     }
@@ -72,7 +55,6 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         setPlayer,
         items,
         setItems,
-        loading,
         clearGame,
       }}
     >
