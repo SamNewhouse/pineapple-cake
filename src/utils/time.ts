@@ -1,4 +1,11 @@
-import { log } from "../lib/logging";
+/**
+ * Waits a random delay between minMs and maxMs.
+ * Logs the delay duration.
+ */
+export async function waitRandomDelay(minMs: number, maxMs: number): Promise<void> {
+  const chosenDelay = Math.floor(Math.random() * (maxMs - minMs + 1)) + minMs;
+  await new Promise((resolve) => setTimeout(resolve, chosenDelay));
+}
 
 /**
  * Waits a random delay between minMs and maxMs, but if the promise takes longer, waits for promise.
@@ -10,8 +17,7 @@ export async function waitRandomDelayUntilDone<T>(
   minMs: number,
   maxMs: number,
 ): Promise<T> {
-  const chosenDelay = Math.floor(Math.random() * (maxMs - minMs + 1)) + minMs;
-  const start = Date.now();
+  await waitRandomDelay(minMs, maxMs);
 
   let resolved = false;
   let value: T;
@@ -27,14 +33,9 @@ export async function waitRandomDelayUntilDone<T>(
       resolved = true;
     });
 
-  await new Promise((resolve) => setTimeout(resolve, chosenDelay));
-
   while (!resolved) {
     await new Promise((r) => setTimeout(r, 16));
   }
-
-  const totalElapsed = Date.now() - start;
-  log(`[LOADER.delay] Loader delay: ${chosenDelay}ms | Total wait: ${totalElapsed}ms`);
 
   if (error) throw error;
   return value!;
