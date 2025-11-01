@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "main": "index.ts",
   "scripts": {
-    "start": "expo start --tunnel",
-    "android": "expo start --android --tunnel",
+    "start": "expo start --tunnel -c",
+    "android": "expo start --android --tunnel -c",
     "ios": "expo run:ios",
     "web": "expo start --web",
     "format": "prettier --write ."
