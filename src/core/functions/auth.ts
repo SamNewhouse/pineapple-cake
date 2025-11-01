@@ -1,4 +1,3 @@
-import { log } from "../../lib/logging";
 import { storeData } from "../../lib/storage";
 import { AuthenticatedPlayer, LocalStorage } from "../../types";
 
@@ -9,8 +8,6 @@ export async function handleLoginSuccess(player: AuthenticatedPlayer) {
   if (!player || !player.id) {
     throw new Error("Login failed: Server did not return valid user data.");
   }
-
-  log("[AUTH.id]", player.id);
 
   return await storeData(LocalStorage.PLAYER, player);
 }

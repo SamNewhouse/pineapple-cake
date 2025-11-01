@@ -1,24 +1,25 @@
 import React, { useState, useEffect } from "react";
 import { View, Text } from "react-native";
+import { AuthenticatedPlayer, Player } from "../../types";
 import { Input } from "../1-atoms/Input";
 import { Button } from "../1-atoms/Button";
-import { AuthenticatedPlayer } from "../../types";
+import { useGame } from "../../context/GameContext";
 import { loginAPI } from "../../core/api/auth";
 import { getData } from "../../lib/storage";
 import { LocalStorage } from "../../types";
 import { handleLoginSuccess } from "../../core/functions/auth";
-import { StackScreenProps } from "@react-navigation/stack";
-import { AuthStackParamList } from "../4-layouts/navigation/AuthNavigator";
 
-type LoginScreenProps = StackScreenProps<AuthStackParamList, "Login"> & {
-  setPlayer: (player: AuthenticatedPlayer | null) => void;
-};
+interface LoginScreenProps {
+  onSignedIn: (player: AuthenticatedPlayer) => void;
+  goToSignup: () => void;
+}
 
-export default function LoginScreen({ setPlayer, navigation }: LoginScreenProps) {
+export function LoginScreen({ onSignedIn, goToSignup }: LoginScreenProps) {
   const [error, setError] = useState<string | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const { setPlayer } = useGame();
 
   useEffect(() => {
     const checkStoredPlayer = async () => {
@@ -26,14 +27,16 @@ export default function LoginScreen({ setPlayer, navigation }: LoginScreenProps)
         const storedPlayer = await getData<AuthenticatedPlayer>(LocalStorage.PLAYER);
         if (storedPlayer?.token) {
           setPlayer(storedPlayer);
+          onSignedIn(storedPlayer);
         }
       } catch (e) {
         console.warn("[LoginScreen] Failed to retrieve stored token", e);
       }
     };
     checkStoredPlayer();
-  }, [setPlayer]);
+  }, [setPlayer, onSignedIn]);
 
+  // Manual login
   async function handleLogin() {
     setError(null);
 
@@ -51,13 +54,23 @@ export default function LoginScreen({ setPlayer, navigation }: LoginScreenProps)
       }
 
       await handleLoginSuccess(player);
-      setPlayer(player);
+      onSignedIn(player);
     } catch (err: any) {
       setError(err.message || "Authentication failed");
     } finally {
       setLoading(false);
     }
   }
+
+  const handleEmailChange = (val: string) => {
+    setEmail(val);
+    if (error) setError(null);
+  };
+
+  const handlePasswordChange = (val: string) => {
+    setPassword(val);
+    if (error) setError(null);
+  };
 
   return (
     <View
@@ -85,7 +98,7 @@ export default function LoginScreen({ setPlayer, navigation }: LoginScreenProps)
       <Input
         placeholder="Email"
         value={email}
-        onChangeText={setEmail}
+        onChangeText={handleEmailChange}
         autoCapitalize="none"
         keyboardType="email-address"
         autoComplete="email"
@@ -94,15 +107,12 @@ export default function LoginScreen({ setPlayer, navigation }: LoginScreenProps)
         placeholder="Password"
         secureTextEntry
         value={password}
-        onChangeText={setPassword}
+        onChangeText={handlePasswordChange}
         autoComplete="password"
       />
 
       <Button onPress={handleLogin}>{loading ? "Signing In..." : "Sign In"}</Button>
-      <Text
-        style={{ color: "#444444", marginBottom: 12, fontWeight: "bold" }}
-        onPress={() => navigation.navigate("Signup")}
-      >
+      <Text style={{ color: "#444444", marginBottom: 12, fontWeight: "bold" }} onPress={goToSignup}>
         Don't have an account? Sign up
       </Text>
       {!!error && (

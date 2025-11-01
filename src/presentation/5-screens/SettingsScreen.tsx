@@ -4,6 +4,7 @@ import { Button } from "../1-atoms/Button";
 import { useRequiredPlayer } from "../../context/GameContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { EXPO_PUBLIC_STAGE } from "../../config/variables";
+import { useStaticData } from "../../context/StaticDataContext";
 import { LocalStorage } from "../../types";
 import { clearStorage } from "../../lib/storage";
 
@@ -13,17 +14,20 @@ interface SettingsScreenProps {
 
 export default function SettingsScreen({ onSignedOut }: SettingsScreenProps) {
   const { player, setPlayer } = useRequiredPlayer();
+  const { collectables, ready } = useStaticData();
 
   if (!player) return null;
 
   const devMode = ["test@test.com", "dev@example.com"].includes(player.email);
 
+  // Simple log out (standard flow)
   const handleSignOut = async () => {
     await clearStorage(LocalStorage.PLAYER);
     setPlayer(null);
     if (onSignedOut) onSignedOut();
   };
 
+  // Developer reset (full clear)
   const handleClearStorage = async () => {
     await AsyncStorage.clear();
     setPlayer(null);

@@ -52,7 +52,7 @@ export default function ScanScreen() {
         } else if (!apiResult.success) {
           setUnlockProbability((prev) => nextUnlockProbability(prev));
         }
-      } catch {
+      } catch (err) {
         setResult({
           success: false,
           message: "Sorry, the scan took too long. Try again!",
