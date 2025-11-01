@@ -19,7 +19,6 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
       setCheckedStorage(false);
 
       try {
-        // Retrieve stored player and token separately
         const player = await getData<AuthenticatedPlayer>(LocalStorage.PLAYER);
 
         if (player && player.token) {

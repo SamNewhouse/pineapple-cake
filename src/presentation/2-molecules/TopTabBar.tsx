@@ -2,7 +2,7 @@ import React from "react";
 import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
 import { Screen } from "../../types";
 
-const tabLabels: Screen[] = ["home", "scan", "items", "trade", "settings"];
+const tabLabels: Screen[] = ["scan", "items", "trade", "profile"];
 
 export default function TopTabBar({
   selectedScreen,

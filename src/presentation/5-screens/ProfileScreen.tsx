@@ -4,42 +4,34 @@ import { Button } from "../1-atoms/Button";
 import { useRequiredPlayer } from "../../context/GameContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { EXPO_PUBLIC_STAGE } from "../../config/variables";
-import { useStaticData } from "../../context/StaticDataContext";
 import { LocalStorage } from "../../types";
 import { clearStorage } from "../../lib/storage";
+import { PlayerIcon } from "../1-atoms/PlayerIcon";
 
 interface SettingsScreenProps {
   onSignedOut?: () => void;
 }
 
-export default function SettingsScreen({ onSignedOut }: SettingsScreenProps) {
+export default function ProfileScreen({ onSignedOut }: SettingsScreenProps) {
   const { player, setPlayer } = useRequiredPlayer();
-  const { collectables, ready } = useStaticData();
 
   if (!player) return null;
 
-  const devMode = ["test@test.com", "dev@example.com"].includes(player.email);
+  const devMode = player.permissions === 1;
 
-  // Simple log out (standard flow)
+  console.log(player);
+
   const handleSignOut = async () => {
     await clearStorage(LocalStorage.PLAYER);
     setPlayer(null);
     if (onSignedOut) onSignedOut();
   };
 
-  // Developer reset (full clear)
   const handleClearStorage = async () => {
     await AsyncStorage.clear();
     setPlayer(null);
     if (onSignedOut) onSignedOut();
   };
-
-  const diagnostics = [
-    { label: "Username", value: player.username },
-    { label: "Player ID", value: player.id },
-    { label: "Email", value: player.email },
-    { label: "Environment", value: EXPO_PUBLIC_STAGE },
-  ];
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: "#1D1D1D" }}>
@@ -52,35 +44,8 @@ export default function SettingsScreen({ onSignedOut }: SettingsScreenProps) {
           padding: 24,
         }}
       >
-        <Text
-          style={{
-            marginBottom: 20,
-            color: "#EBEBED",
-            fontWeight: "bold",
-            fontSize: 32,
-          }}
-        >
-          Settings
-        </Text>
-        <Text
-          style={{
-            marginBottom: 28,
-            color: "#9D8751",
-            fontSize: 16,
-          }}
-        >
-          Review your account & app info
-        </Text>
-        <View style={{ width: "100%", marginBottom: 24 }}>
-          {diagnostics.map((item) => (
-            <View key={item.label} style={{ marginBottom: 10 }}>
-              <Text style={{ color: "#6f6f6f", fontWeight: "600", fontSize: 14 }}>
-                {item.label}:
-              </Text>
-              <Text style={{ color: "#EBEBED", fontSize: 16 }}>{item.value}</Text>
-            </View>
-          ))}
-        </View>
+        <PlayerIcon player={player} />
+        <View style={{ width: "100%", marginBottom: 24 }}></View>
         <Button onPress={handleSignOut} style={{ width: "100%", marginTop: 8 }}>
           Sign Out
         </Button>
