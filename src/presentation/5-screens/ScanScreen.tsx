@@ -1,85 +1,78 @@
-import React, { useState, useCallback } from "react";
+import React, { useEffect, useCallback, useRef } from "react";
 import { View } from "react-native";
+import { useSelector, useDispatch } from "react-redux";
 import Camera from "../1-atoms/Camera";
 import { BarcodeScanningResult } from "expo-camera";
 import { Loading } from "../1-atoms/Loading";
 import { ResultView } from "../2-molecules/ResultView";
-import { ScanResult } from "../../types";
-import {
-  processBarcodeScan,
-  nextUnlockProbability,
-  BASE_PROBABILITY,
-} from "../../core/functions/scan";
-import { useGame, useRequiredPlayer } from "../../context/GameContext";
+import { RootState, AppDispatch } from "../../store";
+import { clearResult, performBarcodeScan, setUnlockProbability } from "../../store/scanSlice";
+import { BASE_PROBABILITY, getNextProbability } from "../../core/functions/scan";
+import { addItem } from "../../store/itemSlice";
 import { EXPO_PUBLIC_STAGE } from "../../config/variables";
-import { waitRandomDelayUntilDone } from "../../utils/time";
 
 export default function ScanScreen() {
-  const { player } = useRequiredPlayer();
-  const { setItems } = useGame();
-  const [processing, setProcessing] = useState(false);
-  const [result, setResult] = useState<ScanResult | null>(null);
-  const [scannerLocked, setScannerLocked] = useState(false);
-  const [unlockProbability, setUnlockProbability] = useState(BASE_PROBABILITY);
+  const dispatch = useDispatch<AppDispatch>();
+  const player = useSelector((state: RootState) => state.player.player);
+  const scan = useSelector((state: RootState) => state.scan);
+  const unlockProbability = useSelector((state: RootState) => state.scan.unlockProbability);
+  const probabilityRef = useRef(unlockProbability);
+
+  useEffect(() => {
+    dispatch(clearResult());
+  }, [dispatch]);
+
+  useEffect(() => {
+    probabilityRef.current = unlockProbability;
+  }, [unlockProbability]);
+
+  const isDev = EXPO_PUBLIC_STAGE === "dev";
 
   const handleBarcodeScanned = useCallback(
     async (scanResult: BarcodeScanningResult) => {
-      if (processing || scannerLocked || !scanResult?.data) return;
-      setProcessing(true);
-      setResult(null);
-      setScannerLocked(true);
+      const shouldBlockScan =
+        !isDev && (scan.scanning || scan.result || scan.error || !player?.id || !scanResult?.data);
 
-      try {
-        const apiResult = await waitRandomDelayUntilDone(
-          processBarcodeScan({
-            scanResult,
-            playerId: player.id,
-            scannerLocked,
-            stage: EXPO_PUBLIC_STAGE,
-            unlockProbability,
-          }),
-          300,
-          800,
-        );
+      if (shouldBlockScan) return;
 
-        setResult(apiResult);
-        setProcessing(false);
-        setScannerLocked(false);
-
-        if (apiResult.success && apiResult.awardedItem) {
-          setItems((prev) => [apiResult.awardedItem!, ...prev]);
-          setUnlockProbability(BASE_PROBABILITY);
-        } else if (!apiResult.success) {
-          setUnlockProbability((prev) => nextUnlockProbability(prev));
+      const currentProbability = probabilityRef.current;
+      dispatch(
+        performBarcodeScan({
+          scanResult,
+          playerId: player!.id,
+          scannerLocked: false,
+          unlockProbability: currentProbability,
+        }),
+      ).then((action: any) => {
+        if (performBarcodeScan.fulfilled.match(action)) {
+          if (action.payload.success && action.payload.awardedItem) {
+            dispatch(addItem(action.payload.awardedItem));
+            dispatch(setUnlockProbability(BASE_PROBABILITY));
+          } else if (!action.payload.success) {
+            const prev = probabilityRef.current;
+            const nextProb = getNextProbability(prev);
+            dispatch(setUnlockProbability(nextProb));
+          }
         }
-      } catch (err) {
-        setResult({
-          success: false,
-          message: "Sorry, the scan took too long. Try again!",
-        });
-        setProcessing(false);
-        setScannerLocked(false);
-      }
+      });
     },
-    [processing, scannerLocked, player.id, EXPO_PUBLIC_STAGE, setItems, unlockProbability],
+    [dispatch, player, scan, isDev],
   );
 
   const resetScan = useCallback(() => {
-    setScannerLocked(false);
-    setResult(null);
-    setProcessing(false);
-  }, []);
+    dispatch(clearResult());
+  }, [dispatch]);
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#1D1D1D" }}>
-      {processing ? (
+    <View style={{ flex: 1 }}>
+      {scan.scanning ? (
         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
           <Loading message="Processing scan..." />
         </View>
       ) : (
         <View style={{ flex: 1 }}>
-          {result ? (
-            <ResultView result={result} resetScan={resetScan} />
+          {scan.result ? (
+            <ResultView result={scan.result} resetScan={resetScan} />
           ) : (
             <Camera onBarcodeScanned={handleBarcodeScanned} />
           )}

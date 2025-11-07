@@ -4,6 +4,7 @@ import { HydratedItem } from "../../types";
 import { LinearGradient } from "expo-linear-gradient";
 import { colorLuminance } from "../../utils/colors";
 import { ItemImage } from "./ItemImage";
+import { colors } from "../../config/theme";
 
 interface ItemModalProps {
   visible: boolean;
@@ -62,7 +63,7 @@ const styles = StyleSheet.create({
     height: "100%",
     borderRadius: 12,
     overflow: "hidden",
-    backgroundColor: "#1D1D1D",
+    backgroundColor: colors.background,
     alignSelf: "center",
   },
   gradient: {

@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { ScrollView, View, Text, TouchableOpacity, RefreshControl } from "react-native";
 import { ItemCard } from "../2-molecules/ItemCard";
 import { HydratedItem } from "../../types";
-import { log } from "../../lib/logging";
 import { waitRandomDelay } from "../../utils/time";
+import { colors, font, spacing } from "../../config/theme";
 
 interface ItemsListProps {
   hydratedItems: HydratedItem[];
@@ -18,16 +18,15 @@ export const ItemsList: React.FC<ItemsListProps> = ({
   onRefresh,
   onItemPress,
 }) => {
-  const [visibleCount, setVisibleCount] = useState(0);
+  const [visibleCount, setVisibleCount] = useState(4);
 
   useEffect(() => {
     let cancelled = false;
 
     async function revealItems() {
-      setVisibleCount(0);
-      for (let i = 1; i <= hydratedItems.length; i++) {
+      for (let i = visibleCount + 1; i <= hydratedItems.length; i++) {
         if (cancelled) break;
-        await waitRandomDelay(66, 666);
+        await waitRandomDelay(34, 346);
         setVisibleCount(i);
       }
     }
@@ -41,10 +40,24 @@ export const ItemsList: React.FC<ItemsListProps> = ({
 
   const renderEmpty = () => (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center", paddingVertical: 60 }}>
-      <Text style={{ marginBottom: 20, color: "#EBEBED", fontWeight: "bold", fontSize: 28 }}>
+      <Text
+        style={{
+          marginBottom: spacing.md,
+          color: colors.text,
+          fontWeight: font.weightBold,
+          fontSize: font.h1,
+        }}
+      >
         No Items Found
       </Text>
-      <Text style={{ color: "#9D8751", textAlign: "center", paddingHorizontal: 40, fontSize: 14 }}>
+      <Text
+        style={{
+          color: colors.accent,
+          textAlign: "center",
+          paddingHorizontal: spacing.xl,
+          fontSize: font.small,
+        }}
+      >
         Start scanning to collect items!
       </Text>
     </View>
@@ -52,13 +65,13 @@ export const ItemsList: React.FC<ItemsListProps> = ({
 
   return (
     <ScrollView
-      contentContainerStyle={{ backgroundColor: "#1D1D1D" }}
+      contentContainerStyle={{ backgroundColor: colors.background }}
       refreshControl={
         onRefresh && refreshing !== undefined ? (
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         ) : undefined
       }
-      style={{ padding: 8 }}
+      style={{ padding: spacing.sm }}
     >
       {hydratedItems.length === 0
         ? renderEmpty()

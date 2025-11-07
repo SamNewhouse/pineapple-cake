@@ -1,67 +1,72 @@
 import React from "react";
 import { ScrollView, View, Text } from "react-native";
 import { Button } from "../1-atoms/Button";
-import { useRequiredPlayer } from "../../context/GameContext";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { EXPO_PUBLIC_STAGE } from "../../config/variables";
-import { LocalStorage } from "../../types";
-import { clearStorage } from "../../lib/storage";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, AppDispatch } from "../../store";
 import { PlayerIcon } from "../1-atoms/PlayerIcon";
+import { setPlayer, clearPlayer } from "../../store/playerSlice";
+import { clearItems } from "../../store/itemSlice";
+import { clearCollectables } from "../../store/collectableSlice";
+import { clearRarities } from "../../store/raritySlice";
+import { clearHistory } from "../../store/scanSlice";
+import { colors, font, spacing } from "../../config/theme";
 
 interface SettingsScreenProps {
   onSignedOut?: () => void;
 }
 
 export default function ProfileScreen({ onSignedOut }: SettingsScreenProps) {
-  const { player, setPlayer } = useRequiredPlayer();
+  const player = useSelector((state: RootState) => state.player.player);
+  const dispatch = useDispatch<AppDispatch>();
 
   if (!player) return null;
 
   const devMode = player.permissions === 1;
 
-  console.log(player);
-
   const handleSignOut = async () => {
-    await clearStorage(LocalStorage.PLAYER);
-    setPlayer(null);
+    dispatch(clearPlayer());
+    dispatch(clearItems());
     if (onSignedOut) onSignedOut();
   };
 
   const handleClearStorage = async () => {
-    await AsyncStorage.clear();
-    setPlayer(null);
+    dispatch(clearPlayer());
+    dispatch(clearItems());
+    dispatch(clearCollectables());
+    dispatch(clearRarities());
+    dispatch(clearHistory());
     if (onSignedOut) onSignedOut();
   };
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: "#1D1D1D" }}>
+    <ScrollView style={{ flex: 1, backgroundColor: colors.background }}>
       <View
         style={{
           flex: 1,
           justifyContent: "center",
           alignItems: "center",
-          backgroundColor: "#1D1D1D",
-          padding: 24,
+          backgroundColor: colors.background,
+          padding: spacing.lg,
         }}
       >
         <PlayerIcon player={player} />
-        <View style={{ width: "100%", marginBottom: 24 }}></View>
-        <Button onPress={handleSignOut} style={{ width: "100%", marginTop: 8 }}>
+        <View style={{ width: "100%", marginBottom: spacing.lg }}></View>
+        <Button onPress={handleSignOut} style={{ width: "100%", marginTop: spacing.sm }}>
           Sign Out
         </Button>
         {devMode && (
           <>
             <Text
               style={{
-                color: "#517F5F",
+                color: colors.accent,
                 fontWeight: "bold",
-                fontSize: 16,
-                marginTop: 36,
+                fontSize: font.body,
+                marginTop: spacing.xl,
               }}
             >
               Dev Tools
             </Text>
-            <Button onPress={handleClearStorage} style={{ width: "100%", marginTop: 12 }}>
+            <Button onPress={handleClearStorage} style={{ width: "100%", marginTop: spacing.md }}>
               Clear Storage
             </Button>
           </>

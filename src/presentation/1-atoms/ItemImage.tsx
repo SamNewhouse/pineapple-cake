@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { ActivityIndicator, Image, ImageStyle, StyleSheet } from "react-native";
+import { colors } from "../../config/theme";
 
 export interface ItemImageProps {
   imageUrl?: string | null;
@@ -51,7 +52,7 @@ export const ItemImage: React.FC<ItemImageProps> = ({ imageUrl, style }) => {
   };
 
   if (loadFailed || !imageUrl) return null;
-  if (loading) return <ActivityIndicator size="small" color="#EBEBED" />;
+  if (loading) return <ActivityIndicator size="small" color={colors.text} />;
 
   return (
     <Image

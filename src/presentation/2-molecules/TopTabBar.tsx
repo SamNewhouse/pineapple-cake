@@ -1,6 +1,7 @@
 import React from "react";
 import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
 import { Screen } from "../../types";
+import { colors, font, spacing } from "../../config/theme";
 
 const tabLabels: Screen[] = ["scan", "items", "trade", "profile"];
 
@@ -41,20 +42,20 @@ const styles = StyleSheet.create({
   },
   tab: {
     flex: 1,
-    paddingVertical: 14,
+    paddingVertical: spacing.md,
     alignItems: "center",
     backgroundColor: "transparent",
   },
   selectedTab: {
-    backgroundColor: "#171717",
+    backgroundColor: colors.card,
     borderRadius: 0,
   },
   tabText: {
-    color: "#6f6f6f",
-    fontSize: 16,
-    fontWeight: "bold",
+    color: colors.textMuted,
+    fontSize: font.body,
+    fontWeight: font.weightBold,
   },
   selectedText: {
-    color: "#EBEBED",
+    color: colors.text,
   },
 });

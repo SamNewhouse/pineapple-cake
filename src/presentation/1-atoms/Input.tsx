@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { TextInput, StyleSheet, TextInputProps } from "react-native";
+import { borderRadius, colors, font, spacing } from "../../config/theme";
 
 export interface CustomInputProps extends Omit<TextInputProps, "style" | "onFocus" | "onBlur"> {
   style?: any;
@@ -18,11 +19,11 @@ export const Input = React.forwardRef<any, CustomInputProps>(
         style={[
           styles.input,
           {
-            borderColor: focused ? "#444444" : "#1D1D1D",
+            borderColor: focused ? colors.textMuted : colors.background,
           },
           style,
         ]}
-        placeholderTextColor="#6f6f6f"
+        placeholderTextColor={colors.textMuted}
         autoCapitalize="none"
         onFocus={(e) => {
           setFocused(true);
@@ -39,14 +40,14 @@ export const Input = React.forwardRef<any, CustomInputProps>(
 
 const styles = StyleSheet.create({
   input: {
-    marginBottom: 16,
+    marginBottom: spacing.md,
     width: "80%",
-    backgroundColor: "#171717",
-    borderRadius: 5,
+    backgroundColor: colors.card,
+    borderRadius: borderRadius.sm,
     borderWidth: 1,
-    fontSize: 16,
-    color: "#EBEBED",
-    paddingVertical: 10,
-    paddingHorizontal: 16,
+    fontSize: font.body,
+    color: colors.text,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
   },
 });

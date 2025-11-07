@@ -1,11 +1,18 @@
 import { useMemo } from "react";
-import { useGame } from "../../context/GameContext";
-import { useStaticData } from "../../context/StaticDataContext";
-import { Collectable, HydratedItem, Item, Rarity } from "../../types";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store";
+import { Collectable, HydratedItem, Rarity } from "../../types";
 
 export function useHydratedItems() {
-  const { items } = useGame();
-  const { collectables, rarities, ready } = useStaticData();
+  const items = useSelector((state: RootState) => state.items.items);
+  const collectables = useSelector((state: RootState) => state.collectables.collectables);
+  const rarities = useSelector((state: RootState) => state.rarities.rarities);
+
+  const ready =
+    Boolean(items && collectables && rarities) &&
+    items.length > 0 &&
+    collectables.length > 0 &&
+    rarities.length > 0;
 
   const collectablesMap = useMemo(
     () => new Map(collectables.map((c) => [c.id, c])),

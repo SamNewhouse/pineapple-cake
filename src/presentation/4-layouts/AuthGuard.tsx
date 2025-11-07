@@ -1,52 +1,74 @@
-import React, { useState, useEffect } from "react";
-import { AuthenticatedPlayer, LocalStorage, Player } from "../../types";
-import { getData } from "../../lib/storage";
+import React, { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, AppDispatch } from "../../store";
 import { LoginScreen } from "../5-screens/LoginScreen";
 import { SignupScreen } from "../5-screens/SignupScreen";
-import { useGame } from "../../context/GameContext";
 import { Loading } from "../1-atoms/Loading";
-import { Preloader } from "../3-organisms/Preloader";
+import { setPlayer } from "../../store/playerSlice";
+import { setItems } from "../../store/itemSlice";
+import { setCollectables } from "../../store/collectableSlice";
+import { setRarities } from "../../store/raritySlice";
+import { AuthenticatedPlayer } from "../../types";
+import { getPlayerItemsAPI } from "../../core/api/players";
+import { getAllCollectablesAPI } from "../../core/api/collectables";
+import { getAllRaritiesAPI } from "../../core/api/rarities";
+import { Centered } from "../1-atoms/Centered";
+import { View } from "react-native";
+import { colors } from "../../config/theme";
 
 export function AuthGuard({ children }: { children: React.ReactNode }) {
-  const { player, setPlayer } = useGame();
-  const [status, setStatus] = useState<"auth-loading" | "preloading" | "authed">("auth-loading");
+  const player = useSelector((state: RootState) => state.player.player);
+  const items = useSelector((state: RootState) => state.items.items);
+  const collectables = useSelector((state: RootState) => state.collectables.collectables);
+  const rarities = useSelector((state: RootState) => state.rarities.rarities);
   const [authScreen, setAuthScreen] = useState<"login" | "signup">("login");
-  const [checkedStorage, setCheckedStorage] = useState(false);
+  const [loadingUserData, setLoadingUserData] = useState(false);
+  const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
-    const checkAuth = async () => {
-      setStatus("auth-loading");
-      setCheckedStorage(false);
+    if (player && player.token && items) {
+      console.log(`[AUTH] user=${player.email || player.id} items=${items.length}`);
+    }
+  }, [player, items]);
 
-      try {
-        const player = await getData<AuthenticatedPlayer>(LocalStorage.PLAYER);
-
-        if (player && player.token) {
-          setPlayer(player);
-          setStatus("preloading");
-        } else {
-          setCheckedStorage(true);
+  useEffect(() => {
+    const fetchMissingData = async () => {
+      if (player && player.token) {
+        if (!collectables || collectables.length === 0 || !rarities || rarities.length === 0) {
+          setLoadingUserData(true);
+          try {
+            if (!collectables || collectables.length === 0) {
+              const data = await getAllCollectablesAPI();
+              dispatch(setCollectables(data));
+            }
+            if (!rarities || rarities.length === 0) {
+              const data = await getAllRaritiesAPI();
+              dispatch(setRarities(data));
+            }
+          } finally {
+            setLoadingUserData(false);
+          }
         }
-      } catch (error) {
-        console.error("[AUTH.guard] Error checking storage:", error);
-        setCheckedStorage(true);
       }
     };
+    fetchMissingData();
+  }, [player, collectables, rarities, dispatch]);
 
-    checkAuth();
-  }, [setPlayer]);
-
-  const handleSignedIn = (playerObj: AuthenticatedPlayer) => {
-    setPlayer(playerObj);
+  // Handle sign in and load initial items
+  const handleSignedIn = async (playerObj: AuthenticatedPlayer) => {
+    dispatch(setPlayer(playerObj));
     setAuthScreen("login");
-    setStatus("preloading");
+    setLoadingUserData(true);
+    try {
+      const items = await getPlayerItemsAPI(playerObj.id);
+      console.log(`[AUTH] Signed in as ${playerObj.email || playerObj.id} items=${items.length}`);
+      dispatch(setItems(items));
+    } finally {
+      setLoadingUserData(false);
+    }
   };
 
-  if (status === "auth-loading" && !checkedStorage) {
-    return <Loading message="Checking authentication..." />;
-  }
-
-  if (!player && checkedStorage) {
+  if (!player) {
     return authScreen === "login" ? (
       <LoginScreen onSignedIn={handleSignedIn} goToSignup={() => setAuthScreen("signup")} />
     ) : (
@@ -54,13 +76,15 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (status === "preloading") {
-    return <Preloader onLoadComplete={() => setStatus("authed")} />;
+  if (loadingUserData) {
+    return (
+      <View style={{ flex: 1, backgroundColor: colors.background }}>
+        <Centered>
+          <Loading message="Loading your game data..." size="large" />
+        </Centered>
+      </View>
+    );
   }
 
-  if (status === "authed" && player) {
-    return <>{children}</>;
-  }
-
-  return <LoginScreen onSignedIn={handleSignedIn} goToSignup={() => setAuthScreen("signup")} />;
+  return <>{children}</>;
 }

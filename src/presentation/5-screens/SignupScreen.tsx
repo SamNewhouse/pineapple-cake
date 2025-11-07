@@ -3,8 +3,12 @@ import { View, Text } from "react-native";
 import { Input } from "../1-atoms/Input";
 import { Button } from "../1-atoms/Button";
 import { AuthenticatedPlayer } from "../../types";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../store";
+import { setPlayer } from "../../store/playerSlice";
 import { signupAPI } from "../../core/api/auth";
 import { handleLoginSuccess } from "../../core/functions/auth";
+import { colors, font, spacing } from "../../config/theme";
 
 interface SignupScreenProps {
   onSignedIn: (player: AuthenticatedPlayer) => void;
@@ -16,15 +20,14 @@ export function SignupScreen({ onSignedIn, goToLogin }: SignupScreenProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch<AppDispatch>();
 
   async function handleSignup() {
     setError(null);
-
     if (!email.trim() || !password.trim()) {
       setError("Please enter both email and password.");
       return;
     }
-
     setLoading(true);
     try {
       const player: AuthenticatedPlayer = await signupAPI(email, password);
@@ -34,7 +37,7 @@ export function SignupScreen({ onSignedIn, goToLogin }: SignupScreenProps) {
       }
 
       await handleLoginSuccess(player);
-
+      dispatch(setPlayer(player));
       onSignedIn(player);
     } catch (err: any) {
       setError(err.message || "Registration failed");
@@ -59,26 +62,28 @@ export function SignupScreen({ onSignedIn, goToLogin }: SignupScreenProps) {
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: "#1D1D1D",
+        backgroundColor: colors.background,
       }}
     >
       <Text
         style={{
-          marginBottom: 20,
-          color: "#EBEBED",
-          fontWeight: "bold",
-          fontSize: 32,
+          marginBottom: spacing.lg,
+          color: colors.text,
+          fontWeight: font.weightBold,
+          fontSize: font.h1,
           textAlign: "center",
+          fontFamily: font.family,
         }}
       >
         Pineapple Cake
       </Text>
       <Text
         style={{
-          marginBottom: 40,
-          color: "#9D8751",
-          fontSize: 16,
+          marginBottom: spacing.xl,
+          color: colors.accent,
+          fontSize: font.body,
           textAlign: "center",
+          fontFamily: font.family,
         }}
       >
         Create a new account
@@ -101,16 +106,26 @@ export function SignupScreen({ onSignedIn, goToLogin }: SignupScreenProps) {
       <Button onPress={handleSignup}>{loading ? "Signing Up..." : "Sign Up"}</Button>
       <Text
         style={{
-          color: "#444444",
-          marginBottom: 12,
-          fontWeight: "bold",
+          color: colors.textMuted,
+          marginBottom: spacing.md,
+          fontWeight: font.weightBold,
+          fontFamily: font.family,
         }}
         onPress={goToLogin}
       >
         Already have an account? Sign in
       </Text>
       {!!error && (
-        <Text style={{ marginBottom: 20, color: "#7B4141", fontWeight: "bold" }}>{error}</Text>
+        <Text
+          style={{
+            marginBottom: spacing.lg,
+            color: colors.danger,
+            fontWeight: font.weightBold,
+            fontFamily: font.family,
+          }}
+        >
+          {error}
+        </Text>
       )}
     </View>
   );

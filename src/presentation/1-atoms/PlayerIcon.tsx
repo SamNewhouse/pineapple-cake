@@ -2,6 +2,7 @@ import React from "react";
 import { Text, View } from "react-native";
 import { Player } from "../../types";
 import { getColor } from "../../utils/colors";
+import * as theme from "../../config/theme";
 
 export interface PlayerIconProps {
   player: Player;
@@ -35,17 +36,19 @@ export const PlayerIcon: React.FC<PlayerIconProps> = ({ player }) => {
   return (
     <View
       style={{
-        borderRadius: 100,
+        borderRadius: theme.borderRadius.round,
         borderWidth: 0,
         width: 124,
         height: 124,
         backgroundColor: bgColor,
         justifyContent: "center",
         alignItems: "center",
-        marginBottom: 18,
+        marginBottom: theme.spacing.md,
       }}
     >
-      <Text style={{ fontSize: 50, fontWeight: "900", color: "#FFFFFF" }}>{initials}</Text>
+      <Text style={{ fontSize: 50, fontWeight: theme.font.weightBold, color: theme.colors.white }}>
+        {initials}
+      </Text>
     </View>
   );
 };
