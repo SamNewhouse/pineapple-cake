@@ -1,5 +1,6 @@
 import React from "react";
 import { View, ActivityIndicator, Text } from "react-native";
+import { colors, font } from "../../config/theme";
 
 interface LoadingProps {
   message?: string;
@@ -20,22 +21,22 @@ export const Loading: React.FC<LoadingProps> = ({ message = "Loading...", size =
       style={{
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: "#1D1D1D",
+        backgroundColor: colors.background,
       }}
     >
       <ActivityIndicator
         size={indicatorSizeMap[size ?? "large"]}
-        color="#EBEBED"
+        color={colors.text}
         style={{
           marginBottom: 12,
         }}
       />
       <Text
         style={{
-          color: "#EBEBED",
+          color: colors.text,
           fontWeight: "bold",
           textAlign: "center",
-          fontSize: 16,
+          fontSize: font.body,
         }}
       >
         {message}

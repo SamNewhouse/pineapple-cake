@@ -1,8 +1,10 @@
 import { Text, View } from "react-native";
-import { useRequiredPlayer } from "../../context/GameContext";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store";
+import { colors, font, spacing } from "../../config/theme";
 
 export default function ScanScreen() {
-  const { player } = useRequiredPlayer();
+  const player = useSelector((state: RootState) => state.player.player);
 
   return (
     <>
@@ -11,11 +13,17 @@ export default function ScanScreen() {
           flex: 1,
           justifyContent: "center",
           alignItems: "center",
-          backgroundColor: "#1D1D1D",
         }}
       >
-        <Text style={{ color: "#EBEBED", fontSize: 32, fontWeight: "800", marginBottom: 12 }}>
-          {player.username}'s Trades
+        <Text
+          style={{
+            color: colors.text,
+            fontSize: font.h1,
+            fontWeight: font.weightBold,
+            marginBottom: spacing.md,
+          }}
+        >
+          {player!.username}'s Trades
         </Text>
       </View>
     </>

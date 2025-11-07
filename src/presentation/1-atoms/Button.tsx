@@ -1,5 +1,6 @@
 import React from "react";
 import { TouchableOpacity, Text, StyleSheet, ViewStyle } from "react-native";
+import { borderRadius, colors, font, spacing } from "../../config/theme";
 
 export interface CustomButtonProps {
   style?: ViewStyle;
@@ -15,18 +16,18 @@ export const Button: React.FC<CustomButtonProps> = ({ style, children, onPress, 
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: "#171717",
-    borderColor: "#1D1D1D",
-    paddingHorizontal: 28,
-    paddingVertical: 14,
-    marginVertical: 12,
+    backgroundColor: colors.card,
+    borderColor: colors.background,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    marginVertical: spacing.md,
     borderWidth: 1,
-    borderRadius: 5,
+    borderRadius: borderRadius.sm,
   },
   text: {
-    fontWeight: "bold",
-    color: "#EBEBED",
+    fontWeight: font.weightBold,
+    color: colors.text,
     textAlign: "center",
-    fontSize: 16,
+    fontSize: font.body,
   },
 });

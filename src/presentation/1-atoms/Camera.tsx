@@ -2,6 +2,7 @@ import React, { useState, useRef } from "react";
 import { View, Text } from "react-native";
 import { BarcodeScanningResult, BarcodeType, CameraView, useCameraPermissions } from "expo-camera";
 import { Button } from "./Button";
+import { borderRadius, colors, font, spacing } from "../../config/theme";
 
 interface CameraProps {
   onBarcodeScanned: (result: BarcodeScanningResult) => void;
@@ -43,7 +44,14 @@ function Camera({ onBarcodeScanned }: CameraProps) {
   if (!permission.granted) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text style={{ color: "#EBEBED", marginBottom: 24, fontSize: 18, fontWeight: "bold" }}>
+        <Text
+          style={{
+            color: colors.text,
+            marginBottom: spacing.lg,
+            fontSize: font.h3,
+            fontWeight: font.weightBold,
+          }}
+        >
           Camera access is required
         </Text>
         <Button onPress={requestPermission}>Grant Camera Permission</Button>
@@ -57,9 +65,9 @@ function Camera({ onBarcodeScanned }: CameraProps) {
         style={{
           width: "90%",
           height: "60%",
-          borderRadius: 8,
+          borderRadius: borderRadius.sm,
           overflow: "hidden",
-          backgroundColor: "#232527",
+          backgroundColor: colors.background,
           alignItems: "center",
           justifyContent: "center",
         }}
@@ -79,7 +87,7 @@ function Camera({ onBarcodeScanned }: CameraProps) {
             left: "10%",
             right: "10%",
             height: 2,
-            backgroundColor: "#B4BBC3",
+            backgroundColor: colors.textMuted,
             top: "50%",
             borderRadius: 2,
           }}
@@ -93,13 +101,13 @@ function Camera({ onBarcodeScanned }: CameraProps) {
               right: 0,
               alignItems: "center",
               backgroundColor: "rgba(30,0,0,0.7)",
-              paddingVertical: 7,
-              paddingHorizontal: 9,
-              borderRadius: 8,
-              marginHorizontal: 20,
+              paddingVertical: spacing.sm,
+              paddingHorizontal: spacing.sm,
+              borderRadius: borderRadius.sm,
+              marginHorizontal: spacing.lg,
             }}
           >
-            <Text style={{ color: "#E76060", fontWeight: "bold" }}>
+            <Text style={{ color: colors.danger, fontWeight: font.weightBold }}>
               Barcode type not supported or not detected!
             </Text>
           </View>

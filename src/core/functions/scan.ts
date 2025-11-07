@@ -1,34 +1,46 @@
 import { scanBarcodeAPI } from "../api/scan";
-import { hasTimedData, addTimedData, clearStorage } from "../../lib/storage";
+import { hasTimedData, addTimedData } from "../../lib/storage";
 import { Item, LocalStorage, ScanResult } from "../../types";
-import { log } from "../../lib/logging";
+import { log, logError } from "../../lib/logging";
+import { EXPO_PUBLIC_STAGE } from "../../config/variables";
 
-export const BASE_PROBABILITY = 0.1;
+export const BASE_PROBABILITY = 0.11;
 export const GROWTH_MIN = 0.003;
-export const GROWTH_MAX = 0.015;
+export const GROWTH_MAX = 0.022;
 export const MAX_PROBABILITY = 0.455;
 
-interface ProcessBarcodeScan {
-  scanResult: { data: string };
-  playerId: string;
-  scannerLocked: boolean;
-  stage: string;
-  unlockProbability: number;
+/**
+ * Given the previous probability, return the next probability and log growth details.
+ * Always accumulates unless capped. Only reset externally.
+ */
+export function getNextProbability(previous: number) {
+  if (
+    typeof previous !== "number" ||
+    isNaN(previous) ||
+    previous < BASE_PROBABILITY ||
+    previous > MAX_PROBABILITY
+  ) {
+    const msg = `[getNextProbability] Invalid previous probability: ${previous}. Must supply the last valid probability from state!`;
+    logError(msg);
+    throw new Error(msg);
+  }
+
+  const growth = Math.random() * (GROWTH_MAX - GROWTH_MIN) + GROWTH_MIN;
+  const next = Math.min(previous + growth, MAX_PROBABILITY);
+
+  log(
+    `[ScanProb]: ${(previous * 100).toFixed(2)}% + ${(growth * 100).toFixed(2)}% = ${(next * 100).toFixed(2)}%`,
+  );
+  return next;
 }
 
 /**
- * Returns the next incremented unlock probability based on previous probability.
- * Applies a random growth each call, within constants defined above.
+ * Logs and returns BASE_PROBABILITY
  */
-export function nextUnlockProbability(currentProbability: number): number {
-  const growth = Math.random() * (GROWTH_MAX - GROWTH_MIN) + GROWTH_MIN;
-  const newProb =
-    currentProbability === null || typeof currentProbability === "undefined"
-      ? BASE_PROBABILITY
-      : Math.min(currentProbability + growth, MAX_PROBABILITY);
-
-  log(`New probability: ${(newProb * 100).toFixed(1)}% (Added growth: ${growth.toFixed(3)})`);
-  return newProb;
+export function getResetProbability() {
+  // eslint-disable-next-line no-console
+  console.log(`Probability reset to base: ${(BASE_PROBABILITY * 100).toFixed(1)}%`);
+  return BASE_PROBABILITY;
 }
 
 /**
@@ -39,24 +51,30 @@ export async function processBarcodeScan({
   scanResult,
   playerId,
   scannerLocked,
-  stage,
   unlockProbability,
-}: ProcessBarcodeScan): Promise<ScanResult> {
+}: {
+  scanResult: { data: string };
+  playerId: string;
+  scannerLocked: boolean;
+  unlockProbability: number;
+}): Promise<ScanResult> {
+  const isDev = EXPO_PUBLIC_STAGE === "dev";
   if (!playerId) return { success: false, message: "No player ID; not logged in." };
-  if (stage === "dev") await clearStorage(LocalStorage.BARCODE);
   if (scannerLocked || !scanResult?.data) {
     return { success: false, message: "Invalid scan." };
   }
 
   const barCodeData = sterilizeBarcode(scanResult.data);
 
-  const alreadyScanned = await hasTimedData(LocalStorage.BARCODE, barCodeData);
-  if (alreadyScanned) {
-    log("[SCAN.exists] Barcode already in storage:", barCodeData);
-    return { success: false, message: "You've already scanned this barcode." };
+  // Only check for duplicates and save outside dev
+  if (!isDev) {
+    const alreadyScanned = await hasTimedData(LocalStorage.BARCODE, barCodeData);
+    if (alreadyScanned) {
+      log("[SCAN.exists] Barcode already in storage:", barCodeData);
+      return { success: false, message: "You've already scanned this barcode." };
+    }
+    await addTimedData(LocalStorage.BARCODE, barCodeData);
   }
-
-  await addTimedData(LocalStorage.BARCODE, barCodeData);
 
   log(`Scan used probability: ${(unlockProbability * 100).toFixed(1)}%`);
   const unlocked = Math.random() < unlockProbability;
@@ -67,7 +85,6 @@ export async function processBarcodeScan({
 
   try {
     const apiResult: Item = await scanBarcodeAPI(playerId);
-
     if (apiResult && typeof apiResult === "object" && apiResult.id) {
       log("ITEM ADDED: ", apiResult);
       return {

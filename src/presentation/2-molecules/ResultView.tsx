@@ -2,11 +2,14 @@ import React from "react";
 import { View, Text } from "react-native";
 import { ScanResult } from "../../types";
 import { Button } from "../1-atoms/Button";
-import { useStaticData } from "../../context/StaticDataContext";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store";
 import { hydrateItem } from "../../core/functions/items";
+import { colors, font, spacing } from "../../config/theme";
 
 export function ResultView({ result, resetScan }: { result: ScanResult; resetScan: () => void }) {
-  const { collectables, rarities } = useStaticData();
+  const collectables = useSelector((state: RootState) => state.collectables.collectables);
+  const rarities = useSelector((state: RootState) => state.rarities.rarities);
   const { success, message, awardedItem } = result;
 
   if (!success) {
@@ -16,16 +19,16 @@ export function ResultView({ result, resetScan }: { result: ScanResult; resetSca
           flex: 1,
           justifyContent: "center",
           alignItems: "center",
-          backgroundColor: "#1D1D1D",
+          backgroundColor: colors.background,
         }}
       >
         <Text
           style={{
-            color: "#7B4141",
-            fontWeight: "bold",
+            color: colors.accent,
+            fontWeight: font.weightBold,
             textAlign: "center",
-            fontSize: 28,
-            marginBottom: 20,
+            fontSize: font.h1,
+            marginBottom: spacing.lg,
           }}
         >
           {message}
@@ -33,10 +36,10 @@ export function ResultView({ result, resetScan }: { result: ScanResult; resetSca
         <Button
           onPress={resetScan}
           style={{
-            backgroundColor: "#171717",
-            borderColor: "#1D1D1D",
-            paddingHorizontal: 20,
-            paddingVertical: 20,
+            backgroundColor: colors.card,
+            borderColor: colors.background,
+            paddingHorizontal: spacing.lg,
+            paddingVertical: spacing.lg,
             marginVertical: "5%",
           }}
         >
@@ -89,18 +92,7 @@ export function ResultView({ result, resetScan }: { result: ScanResult; resetSca
         Rarity: {Math.round(hydrated.rarity.minChance * 100)}% -{" "}
         {Math.round(hydrated.rarity.maxChance * 100)}%
       </Text>
-      <Button
-        onPress={resetScan}
-        style={{
-          backgroundColor: "#171717",
-          borderColor: "#1D1D1D",
-          paddingHorizontal: 20,
-          paddingVertical: 20,
-          marginVertical: "5%",
-        }}
-      >
-        Scan Another
-      </Button>
+      <Button onPress={resetScan}>Scan Another</Button>
     </View>
   );
 }
