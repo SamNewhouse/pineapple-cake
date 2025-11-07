@@ -1,3 +1,5 @@
+<center><img src="https://raw.githubusercontent.com/SamNewhouse/pineapple-cake/main/assets/icon.png" alt="Description" width="300" height="300"></center>
+
 # 🍰 Pineapple Cake
 
 A React Native mobile game built with Expo, designed as the frontend for the Pineapple Donut backend—collect, trade, and manage virtual items in a playful game ecosystem.
