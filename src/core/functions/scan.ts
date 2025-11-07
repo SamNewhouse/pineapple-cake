@@ -2,7 +2,6 @@ import { scanBarcodeAPI } from "../api/scan";
 import { hasTimedData, addTimedData } from "../../lib/storage";
 import { Item, LocalStorage, ScanResult } from "../../types";
 import { log, logError } from "../../lib/logging";
-import { EXPO_PUBLIC_STAGE } from "../../config/variables";
 
 export const BASE_PROBABILITY = 0.11;
 export const GROWTH_MIN = 0.003;
@@ -58,7 +57,7 @@ export async function processBarcodeScan({
   scannerLocked: boolean;
   unlockProbability: number;
 }): Promise<ScanResult> {
-  const isDev = EXPO_PUBLIC_STAGE === "dev";
+  const isDev = __DEV__;
   if (!playerId) return { success: false, message: "No player ID; not logged in." };
   if (scannerLocked || !scanResult?.data) {
     return { success: false, message: "Invalid scan." };

@@ -23,6 +23,8 @@ const itemImages = [
 export const ItemCard: React.FC<ItemCardProps> = ({ hydratedItem, onPress }) => {
   const { item, collectable, rarity } = hydratedItem;
 
+  // TODO: __DEV__ randomImage, if PROD use collectable.imageId which will reference local file.
+
   const randomImage = useMemo(() => {
     return itemImages[Math.floor(Math.random() * itemImages.length)];
   }, [item.id]);

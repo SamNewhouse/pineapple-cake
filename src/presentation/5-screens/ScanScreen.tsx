@@ -9,7 +9,6 @@ import { RootState, AppDispatch } from "../../store";
 import { clearResult, performBarcodeScan, setUnlockProbability } from "../../store/scanSlice";
 import { BASE_PROBABILITY, getNextProbability } from "../../core/functions/scan";
 import { addItem } from "../../store/itemSlice";
-import { EXPO_PUBLIC_STAGE } from "../../config/variables";
 
 export default function ScanScreen() {
   const dispatch = useDispatch<AppDispatch>();
@@ -26,12 +25,13 @@ export default function ScanScreen() {
     probabilityRef.current = unlockProbability;
   }, [unlockProbability]);
 
-  const isDev = EXPO_PUBLIC_STAGE === "dev";
+  const isDev = __DEV__;
 
   const handleBarcodeScanned = useCallback(
     async (scanResult: BarcodeScanningResult) => {
       const shouldBlockScan =
-        !isDev && (scan.scanning || scan.result || scan.error || !player?.id || !scanResult?.data);
+        !__DEV__ &&
+        (scan.scanning || scan.result || scan.error || !player?.id || !scanResult?.data);
 
       if (shouldBlockScan) return;
 

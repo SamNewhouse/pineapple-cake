@@ -1,52 +1,61 @@
-![App Icon](https://raw.githubusercontent.com/SamNewhouse/pineapple-cake/main/assets/icon.png)
-
 # 🍰 Pineapple Cake
 
 A React Native mobile game built with Expo, designed as the frontend for the Pineapple Donut backend—collect, trade, and manage virtual items in a playful game ecosystem.
 
----
+***
 
 ## 📱 About
 
-Pineapple Cake lets users:
+Pineapple Cake is a mobile game where you scan real-world barcodes and objects to discover and grow your collection of unique virtual items.
 
-- **Scan items** (barcodes + physical items) with device camera, using advanced scan probability logic and anti-repeat safety
-- **Collect items** in their inventory, with hydrated metadata, rarity, and state consistency
-- **Trade with other players** _(feature in progress)_
-- **Authenticate securely (Google/JWT)_
-- Seamless sync with Pineapple Donut serverless backend (AWS Lambda/DynamoDB)
+**Main Features:**
 
----
+- **Scan Items:** Unlock new collectibles using your phone’s camera, blending real and virtual exploration.
+- **Collect Items:** Build your personal inventory of rare, fun, and varied virtual items.
+- **Profile Customisation (Coming soon):** Personalize your profile with unique username, icon, bio and more.
+- **Trading (Coming Soon):** Connect with other players to exchange, complete, and expand your collection.
+
+Pineapple Cake is for anyone who enjoys collecting, discovering new items, and sharing or trading with others in a playful digital world.
+
+***
 
 ## 🛠️ Tech Stack
 
-- **Framework:** React Native (0.81.4), Expo SDK 54
-- **Language:** TypeScript 5.9.3
-- **State:** Context API
+- **Framework:** React Native (0.81+), Expo SDK 54
+- **Language:** TypeScript 5.x
+- **State Management:**  
+  - **Redux Toolkit** — robust, scalable global state (inventory, scans, player, etc.)
+  - **redux-persist** — persistent state across reloads/offline (items, player, scan history, etc.)
 - **HTTP:** Axios
 - **Auth:** JWT token
-- **Camera:** Expo Camera (+ new probability/scan engine)
-- **Storage:** AsyncStorage
-
----
+- **Camera:** Expo Camera (advanced scan probability, anti-repeat logic)
+- **Storage:** AsyncStorage (used as redux-persist storage engine)
+- **UI Architecture:** Atomic design (atoms → molecules → organisms → screens/layouts)
 
 ## 📂 Project Structure
 
+```bash
 src/
-├── assets/              # Images, icons, and static assets
-│   └── items/           # Item-specific images (sprites, etc.)
-├── context/             # React Context providers for global state (Game, StaticData, Auth, etc.)
-├── core/                # Core utils: api/, auth/, storage/, scan.ts (scan logic), logging, etc.
-│   └── api/             # API communication modules (players, items, trades, etc.)
-├── presentation/
-│   ├── 1-atoms/         # Base UI (Button, Input, Camera, Loading)
-│   ├── 2-molecules/     # Composed UI (ResultView, filtered lists, etc.)
-│   ├── 3-organisms/     # Larger UI (forms, preloaders)
-│   ├── 4-layouts/       # Page layouts (AuthGuard, MainLayout, etc.)
-│   └── 5-screens/       # Main screens (Inventory, Login, etc.)
-└── types/               # Shared TypeScript types (Player, Item, etc.)
+├── assets/                # Static images, icons, sprites
+│   └── items/             # Item-specific images
+├── config/                # Theme, global variables
+├── core/                  # Core utilities and business logic
+│   ├── api/               # API calls (auth, items, players, trades, etc.)
+│   └── functions/         # Core functions (auth, items, scan logic, etc.)
+├── lib/                   # Low-level helpers (http requests, logging, storage)
+├── presentation/          # UI components, organized by atomic design
+│   ├── 1-atoms/           # Base components (Button, Camera, Loading, etc.)
+│   ├── 2-molecules/       # Composed components (ItemCard, ResultView)
+│   ├── 3-organisms/       # Feature blocks (ItemsList)
+│   ├── 4-layouts/         # Layout wrappers (AppInitializer, MainLayout)
+│   └── 5-screens/         # Screen views (Inventory, Scan, Profile, etc.)
+├── store/                 # Redux slices and store setup (items, player, scan, etc.)
+├── types/                 # Shared TypeScript types/interfaces
+└── utils/                 # Color, number, and time helpers
+```
 
----
+
+***
 
 ## 🚀 Getting Started
 
@@ -58,62 +67,65 @@ src/
 
 ### Installation
 
+```bash
 git clone https://github.com/SamNewhouse/pineapple-cake.git
 cd pineapple-cake
 npm install
+```
 
 1. **Environment:** Create a `.env` and set backend API URL:
-   API_URL=https://your-backend-url.com
-   STAGE=development
+
+```
+API_URL=https://your-backend-url.com
+STAGE=development
+```
 
 2. **Run App:**
-   npm start          # Launch Expo Dev Server
-   npm run android    # Android emulator/device
-   npm run ios        # iOS Simulator/device
-   npm run web        # Web browser
+
+```
+npm start          # Launch Expo Dev Server
+npm run android    # Android emulator/device
+npm run ios        # iOS Simulator/device
+npm run web        # Web browser
+```
 
 3. **Formatting Code:**
-   npm run format
 
----
+```
+npm run format
+```
 
-## 📱 Features
 
-- **Advanced Camera Scanning:** Barcode/item scan logic; probabilistic unlock, anti-repeat, fallback handling
-- **Collectable System:** Hydrated item details, rarity, caching & state sync
-- **Trading:** Offer/request/trade items with others _(in progress)_
-- **Google Authentication**
-- **Cross-Platform:** iOS, Android, Web (Expo)
-- **Offline Support:** Local caching via AsyncStorage
-- **ItemCard UI:** Refined with icons, layout tweaks
-
----
+***
 
 ## 🔧 Configuration
 
 - `app.json` — Expo config (icon, name, splash, etc.)
 - `eas.json` — Expo build services config
-- `.env` — API endpoint/env
+- `.env` — API endpoints/env
 
+***
 
-## 📦 Build & Deploy
+## 📦 Build \& Deploy
 
 Build with Expo EAS:
-eas build --platform all
 
----
+```bash
+eas build --platform all
+```
+
+
+***
 
 ## 📄 License
 
 This project is private and proprietary.
 
----
+***
 
 ## 👨‍💻 Author
 
 **Sam Newhouse**
 
-I'm just bored
-
-- Website: www.samnewhouse.co.uk
-- GitHub: @SamNewhouse
+- Website: [www.samnewhouse.co.uk](https://www.samnewhouse.co.uk)
+- GitHub: [SamNewhouse (Sam Newhouse)](https://github.com/SamNewhouse)

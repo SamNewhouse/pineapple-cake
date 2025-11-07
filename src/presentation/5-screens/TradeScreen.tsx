@@ -1,11 +1,7 @@
 import { Text, View } from "react-native";
-import { useSelector } from "react-redux";
-import { RootState } from "../../store";
 import { colors, font, spacing } from "../../config/theme";
 
 export default function ScanScreen() {
-  const player = useSelector((state: RootState) => state.player.player);
-
   return (
     <>
       <View
@@ -23,7 +19,7 @@ export default function ScanScreen() {
             marginBottom: spacing.md,
           }}
         >
-          {player!.username}'s Trades
+          Coming soon
         </Text>
       </View>
     </>
