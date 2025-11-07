@@ -76,7 +76,7 @@ export async function processBarcodeScan({
     await addTimedData(LocalStorage.BARCODE, barCodeData);
   }
 
-  log(`Scan used probability: ${(unlockProbability * 100).toFixed(1)}%`);
+  log(`[ScanChance]: ${(unlockProbability * 100).toFixed(1)}%`);
   const unlocked = Math.random() < unlockProbability;
 
   if (!unlocked) {
