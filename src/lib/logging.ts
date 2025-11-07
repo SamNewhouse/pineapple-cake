@@ -1,13 +1,11 @@
-import { EXPO_PUBLIC_STAGE } from "../config/variables";
-
 export function log(...args: any[]) {
-  if (EXPO_PUBLIC_STAGE === "dev") {
+  if (__DEV__) {
     console.log(...args);
   }
 }
 
 export function logError(...args: any[]) {
-  if (EXPO_PUBLIC_STAGE === "dev") {
+  if (__DEV__) {
     console.error(...args);
   }
 }
